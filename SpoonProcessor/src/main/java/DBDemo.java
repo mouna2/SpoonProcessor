@@ -176,7 +176,7 @@ public class DBDemo {
     		
 			Connection conn=getConnection();
 			Statement st= conn.createStatement();
-			st.executeUpdate("INSERT INTO `classes`(`classname`) VALUES ('"+clazz.getSimpleName()+"');");
+			st.executeUpdate("INSERT INTO `classes`(`classname`) VALUES ('"+clazz.getPackage()+""+clazz.getSimpleName()+"');");
 			 ResultSet rs = st.executeQuery("SELECT * FROM classes"); 
    		   while(rs.next()){
    			   System.out.println(rs.getString("classname"));

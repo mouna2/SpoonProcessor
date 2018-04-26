@@ -12,9 +12,11 @@ import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtModule;
+import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.ClassFactory;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.factory.PackageFactory;
 import spoon.reflect.factory.TypeFactory;
 import spoon.reflect.visitor.Filter;
 import spoon.reflect.visitor.filter.FieldAccessFilter;
@@ -37,8 +39,30 @@ public class Main {
     	// Interact with model
     	Factory factory = spoon.getFactory();
     	ClassFactory classFactory = factory.Class();
+    	PackageFactory packagefactory = factory.Package(); 
+    
+for(CtType<?> clazz : classFactory.getAll()) {
+    		
+    		System.out.println(clazz.getSimpleName());
+    		System.out.println(clazz.getPackage());
+    		classnames.add(clazz.getPackage()+""+clazz.getQualifiedName()); 
+    		clazz.getSuperclass();
+    		
+    		clazz.getSuperInterfaces();
+    		
     	
+   
+    		
+    		
+    		 for(CtField<?> field : clazz.getFields()) {
+    				for(CtMethod<?> method :clazz.getMethods()) {
+    	    			// method.getParameters()
+    	    			method.<CtFieldAccess<?>>getElements(new FieldAccessFilter(field.getReference()));
+    	    		}
+    		 }
+    	}
     	
+ 	
     	for(CtType<?> clazz : classFactory.getAll()) {
     		
     		System.out.println(clazz.getSimpleName());
