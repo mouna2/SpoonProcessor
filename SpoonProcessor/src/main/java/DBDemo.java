@@ -131,6 +131,7 @@ public class DBDemo {
 			Statement st= conn.createStatement();
 			st.executeUpdate("TRUNCATE TABLE `classes`"); 
 			st.executeUpdate("TRUNCATE TABLE `superclasses`"); 
+			st.executeUpdate("TRUNCATE TABLE `interfaces`"); 
 		   Spoon(); 
 		  
 		   
