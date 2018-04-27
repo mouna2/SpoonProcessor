@@ -57,7 +57,9 @@ for(CtType<?> clazz : classFactory.getAll()) {
     		 for(CtField<?> field : clazz.getFields()) {
     				for(CtMethod<?> method :clazz.getMethods()) {
     	    			// method.getParameters()
+    				
     	    			method.<CtFieldAccess<?>>getElements(new FieldAccessFilter(field.getReference()));
+    	    		
     	    		}
     		 }
     	}

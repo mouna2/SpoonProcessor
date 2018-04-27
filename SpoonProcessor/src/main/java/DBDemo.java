@@ -16,6 +16,7 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.ClassFactory;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.filter.FieldAccessFilter;
 
 /**
@@ -84,7 +85,7 @@ public class DBDemo {
 		connectionProps.put("root", this.userName);
 		connectionProps.put("123", this.password);
 
-		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/databasechess","root","123");
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/databasechess2","root","123");
 
 		return conn;
 	}
@@ -128,13 +129,15 @@ public class DBDemo {
 		try {
 			
 			Statement st= conn.createStatement();
+			st.executeUpdate("TRUNCATE TABLE `classes`"); 
+			st.executeUpdate("TRUNCATE TABLE `superclasses`"); 
 		   Spoon(); 
 		  
 		   
 		   
 		   rs= st.executeQuery("SELECT * FROM CLASSES");
 		   while(rs.next()){
-			   System.out.println(rs.getString("classname"));
+			   //System.out.println(rs.getString("classname"));
 		   }
 	    } catch (SQLException e) {
 			System.out.println("ERROR: Could not create the table");
@@ -162,31 +165,30 @@ public class DBDemo {
     	spoon.getEnvironment().setAutoImports(true);
     	spoon.getEnvironment().setNoClasspath(true);
     	CtModel model = spoon.buildModel();
-    	List<String> classnames= new ArrayList<String>(); 
+    	//List<String> classnames= new ArrayList<String>(); 
   
     	// Interact with model
     	Factory factory = spoon.getFactory();
     	ClassFactory classFactory = factory.Class();
-    	
+    	int i=1; 
     	
     	for(CtType<?> clazz : classFactory.getAll()) {
     		
-    		System.out.println(clazz.getSimpleName());
+    		//System.out.println(clazz.getSimpleName());
     		
     		
 			Connection conn=getConnection();
 			Statement st= conn.createStatement();
-			st.executeUpdate("INSERT INTO `classes`(`classname`) VALUES ('"+clazz.getPackage()+""+clazz.getSimpleName()+"');");
+			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
+			st.executeUpdate("INSERT INTO `classes`(`classname`) VALUES ('"+FullClassName+"');");
+		
 			 ResultSet rs = st.executeQuery("SELECT * FROM classes"); 
    		   while(rs.next()){
-   			   System.out.println(rs.getString("classname"));
-   		   }
-		
-			classnames.add(clazz.getQualifiedName()); 
-    		clazz.getSuperclass();
+   			   //System.out.println(rs.getString("classname"));
+   		   }			
+   		
     		
-    		clazz.getSuperInterfaces();
-    		
+    				
     	
    
     		
@@ -199,5 +201,45 @@ public class DBDemo {
     		 }
     	}
     	
+    	
+    	
+    	for(CtType<?> clazz : classFactory.getAll()) {
+    		String childclassQuery = null; 
+    		String superclassQuery = null;
+    		Connection conn=getConnection();
+			Statement st= conn.createStatement();
+			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
+if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.java_chess") && clazz.getSuperclass().toString().contains("TestCase")==false) {
+    			
+    			String superclass= clazz.getSuperclass().toString();
+    			System.out.println(i+"    HERE IS MY SUPERCLASS"+superclass+"AND HERE IS MY SUBCLASS  "+FullClassName);
+    		i++; 
+    
+    					ResultSet sClass = st.executeQuery("SELECT id from classes where classname='"+superclass+"'"); 
+    					while(sClass.next()){
+    						 superclassQuery= sClass.getString("id"); 
+    						System.out.println("superclass: "+superclassQuery);	
+    			   		   }
+    					
+    					
+    					ResultSet cClass = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
+    					while(cClass.next()){
+    						 childclassQuery= cClass.getString("id"); 
+    						System.out.println("subclass: "+childclassQuery);	
+    			   		   }
+    					
+    					
+    			String result= "SELECT classname from classes where classname='"+FullClassName+"'"; 
+    			st.executeUpdate("INSERT INTO `superclasses`(`superclass`, `childclass`) VALUES ('"+superclassQuery +"','" +childclassQuery+"')");
+    			
+    		
+    		
+    		/*	st.executeUpdate("INSERT INTO `superclasses`(`superclass`, `childclass`) VALUES( "
+    					+"(("+ superclassQuery+")"
+    					+ ", ("+childclassQuery+")));" ); */
+        		clazz.getSuperInterfaces();
+        		
+    		}
+    	}
 	}
 }
