@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import spoon.Launcher;
 import spoon.SpoonAPI;
@@ -70,7 +71,6 @@ public class DBDemo {
 	
 	/** The name of the table we are testing with */
 	private final String tableName = "classes";
-	
 	
 	
 	/**
@@ -158,7 +158,9 @@ public class DBDemo {
 	
 	public void Spoon() throws SQLException {
 	DBDemo dao = new DBDemo();
-	   
+	Connection conn=getConnection();
+	Statement st= conn.createStatement();
+	
 	    
 		SpoonAPI spoon = new Launcher();
     	spoon.addInputResource("C:\\Users\\mouna\\Downloads\\chessgantcode\\workspace_codeBase\\Chess");
@@ -171,13 +173,14 @@ public class DBDemo {
     	Factory factory = spoon.getFactory();
     	ClassFactory classFactory = factory.Class();
     	int i=1; 
-    	
+        /*********************************************************************************************************************************************************************************/	
+        /*********************************************************************************************************************************************************************************/	
+        /*********************************************************************************************************************************************************************************/	  	
     	for(CtType<?> clazz : classFactory.getAll()) {
     		
     	//BUILD CLASSES TABLE 
     		
-			Connection conn=getConnection();
-			Statement st= conn.createStatement();
+			
 			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
 			st.executeUpdate("INSERT INTO `classes`(`classname`) VALUES ('"+FullClassName+"');");
 		
@@ -200,13 +203,15 @@ public class DBDemo {
     		 }
     	}
     	
-    	
+    /*********************************************************************************************************************************************************************************/	
+    /*********************************************************************************************************************************************************************************/	
+    /*********************************************************************************************************************************************************************************/	
+
     	//BUILD SUPERCLASSES TABLE 
     	for(CtType<?> clazz : classFactory.getAll()) {
     		String childclassQuery = null; 
     		String superclassQuery = null;
-    		Connection conn=getConnection();
-			Statement st= conn.createStatement();
+    		
 			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
 if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.java_chess") && clazz.getSuperclass().toString().contains("TestCase")==false) {
     			
@@ -239,6 +244,47 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
         		clazz.getSuperInterfaces();
         		
     		}
+    	}
+    	
+        /*********************************************************************************************************************************************************************************/	
+        /*********************************************************************************************************************************************************************************/	
+        /*********************************************************************************************************************************************************************************/	  	
+     	//BUILD INTERFACES TABLE 
+    	for(CtType<?> clazz : classFactory.getAll()) {
+    		
+    		
+    		String myinterface = null;
+    		String myclass = null;
+    		
+			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
+			Set<CtTypeReference<?>> interfaces = clazz.getSuperInterfaces(); 
+			
+			for(CtTypeReference<?> inter: interfaces) {
+				System.out.println("my interface   "+inter);
+				if(inter.toString().contains("java_chess")) {
+					
+					
+					ResultSet interfacesclasses = st.executeQuery("SELECT id from classes where classname='"+inter+"'"); 
+
+					while(interfacesclasses.next()){
+						myinterface= interfacesclasses.getString("id"); 
+						System.out.println("interface: "+myinterface);	
+			   		   }
+					
+					ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
+					while(classesreferenced.next()){
+						myclass= classesreferenced.getString("id"); 
+						System.out.println("class referenced: "+myclass);	
+			   		   }
+					
+					
+					
+	    			st.executeUpdate("INSERT INTO `interfaces`(`classid`, `interfaceid`) VALUES ('"+myclass +"','" +myinterface+"')");
+				}
+				
+			}
+			
+
     	}
 	}
 }
