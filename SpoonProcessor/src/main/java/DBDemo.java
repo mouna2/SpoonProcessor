@@ -174,8 +174,7 @@ public class DBDemo {
     	
     	for(CtType<?> clazz : classFactory.getAll()) {
     		
-    		//System.out.println(clazz.getSimpleName());
-    		
+    	//BUILD CLASSES TABLE 
     		
 			Connection conn=getConnection();
 			Statement st= conn.createStatement();
@@ -192,7 +191,7 @@ public class DBDemo {
     	
    
     		
-    		
+  		
     		 for(CtField<?> field : clazz.getFields()) {
     				for(CtMethod<?> method :clazz.getMethods()) {
     	    			// method.getParameters()
@@ -202,7 +201,7 @@ public class DBDemo {
     	}
     	
     	
-    	
+    	//BUILD SUPERCLASSES TABLE 
     	for(CtType<?> clazz : classFactory.getAll()) {
     		String childclassQuery = null; 
     		String superclassQuery = null;
