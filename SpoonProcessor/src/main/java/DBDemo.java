@@ -371,8 +371,10 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
 			   		   }
 					
 					
-					
-	    			st.executeUpdate("INSERT INTO `fields`(`fieldname`, `classreferenced`) VALUES ('"+field +"','" +myclass+"')");
+					if(field.toString().contains("java.awt")==false && field.toString().contains("javax")==false) {
+		    			st.executeUpdate("INSERT INTO `fields`(`fieldname`, `classreferenced`) VALUES ('"+field +"','" +myclass+"')");
+
+					}
 				
 				
 			}
