@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -17,6 +18,7 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.ClassFactory;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.filter.FieldAccessFilter;
 
@@ -84,8 +86,7 @@ public class DBDemo {
 		Properties connectionProps = new Properties();
 		connectionProps.put("root", this.userName);
 		connectionProps.put("123", this.password);
-
-		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/databasechess2","root","123");
+		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/databasechess","root","123");
 
 		return conn;
 	}
@@ -127,19 +128,71 @@ public class DBDemo {
 
 		// Create a table
 		try {
-			
 			Statement st= conn.createStatement();
-			st.executeUpdate("TRUNCATE TABLE `classes`"); 
-			st.executeUpdate("TRUNCATE TABLE `superclasses`"); 
-			st.executeUpdate("TRUNCATE TABLE `interfaces`"); 
+			st.executeUpdate("DROP SCHEMA `databasechess`"); 
+			
+			st.executeUpdate("CREATE DATABASE `databasechess`"); 
+			st.executeUpdate("CREATE TABLE `databasechess`.`classes` (\r\n" + 
+					"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
+					"  `classname` LONGTEXT NULL,\r\n" + 
+					"  PRIMARY KEY (`id`),\r\n" + 
+					"  UNIQUE INDEX `idclasses_UNIQUE` (`id` ASC));"); 
+			
+			
+			st.executeUpdate("CREATE TABLE `databasechess`.`superclasses` (\r\n" + 
+					"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
+					"  `superclass` INT NULL,\r\n" + 
+					"  `childclass` INT NULL,\r\n" + 
+					"  PRIMARY KEY (`id`),\r\n" + 
+					"  INDEX `superclass_idx` (`superclass` ASC),\r\n" + 
+					"  INDEX `childclass_idx` (`childclass` ASC),\r\n" + 
+					"  CONSTRAINT `superclass`\r\n" + 
+					"    FOREIGN KEY (`superclass`)\r\n" + 
+					"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+					"    ON DELETE NO ACTION\r\n" + 
+					"    ON UPDATE NO ACTION,\r\n" + 
+					"  CONSTRAINT `childclass`\r\n" + 
+					"    FOREIGN KEY (`childclass`)\r\n" + 
+					"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+					"    ON DELETE NO ACTION\r\n" + 
+					"    ON UPDATE NO ACTION);"); 
+			
+			st.executeUpdate("CREATE TABLE `databasechess`.`interfaces` (\r\n" + 
+					"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
+					"  `interface` INT NULL,\r\n" + 
+					"  `classreferenced` INT NULL,\r\n" + 
+					"  PRIMARY KEY (`id`),\r\n" + 
+					"  INDEX `interface_idx` (`interface` ASC),\r\n" + 
+					"  INDEX `classreferenced_idx` (`classreferenced` ASC),\r\n" + 
+					"  CONSTRAINT `interface`\r\n" + 
+					"    FOREIGN KEY (`interface`)\r\n" + 
+					"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+					"    ON DELETE NO ACTION\r\n" + 
+					"    ON UPDATE NO ACTION,\r\n" + 
+					"  CONSTRAINT `classreferenced`\r\n" + 
+					"    FOREIGN KEY (`classreferenced`)\r\n" + 
+					"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+					"    ON DELETE NO ACTION\r\n" + 
+					"    ON UPDATE NO ACTION);"); 
+			
+			st.executeUpdate("CREATE TABLE `databasechess`.`fields` (\r\n" + 
+					"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
+					"  `fieldname` LONGTEXT NULL,\r\n" + 
+					"  `classreferenced` INT NULL,\r\n" + 
+					"  PRIMARY KEY (`id`),\r\n" + 
+					"  INDEX `classreferenced_idx` (`classreferenced` ASC),\r\n" + 
+					"  CONSTRAINT `classreferenced2`\r\n" + 
+					"    FOREIGN KEY (`classreferenced`)\r\n" + 
+					"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+					"    ON DELETE NO ACTION\r\n" + 
+					"    ON UPDATE NO ACTION);"); 
+			
+		
 		   Spoon(); 
 		  
 		   
 		   
-		   rs= st.executeQuery("SELECT * FROM CLASSES");
-		   while(rs.next()){
-			   //System.out.println(rs.getString("classname"));
-		   }
+		
 	    } catch (SQLException e) {
 			System.out.println("ERROR: Could not create the table");
 			e.printStackTrace();
@@ -280,8 +333,47 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
 					
 					
 					
-	    			st.executeUpdate("INSERT INTO `interfaces`(`classid`, `interfaceid`) VALUES ('"+myclass +"','" +myinterface+"')");
+	    			st.executeUpdate("INSERT INTO `interfaces`(`classreferenced`, `interface`) VALUES ('"+myclass +"','" +myinterface+"')");
 				}
+				
+			}
+			
+
+    	}
+    	
+    	
+    	 /*********************************************************************************************************************************************************************************/	
+        /*********************************************************************************************************************************************************************************/	
+        /*********************************************************************************************************************************************************************************/	  	
+     	//BUILD FIELDS TABLE 
+    	for(CtType<?> clazz : classFactory.getAll()) {
+    		
+    		
+    	
+    		String myclass = null;
+    		
+		
+		
+			Collection<CtFieldReference<?>> fields = clazz.getAllFields(); 
+			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
+			
+			
+			for(CtFieldReference<?> field: fields) {
+				
+				//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
+				System.out.println("my field   "+field);
+				
+					
+					ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
+					while(classesreferenced.next()){
+						myclass= classesreferenced.getString("id"); 
+						System.out.println("class referenced: "+myclass);	
+			   		   }
+					
+					
+					
+	    			st.executeUpdate("INSERT INTO `fields`(`fieldname`, `classreferenced`) VALUES ('"+field +"','" +myclass+"')");
+				
 				
 			}
 			
