@@ -21,6 +21,7 @@ import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.ClassFactory;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.path.CtPath;
 import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.filter.FieldAccessFilter;
@@ -481,8 +482,9 @@ for(CtType<?> clazz : classFactory.getAll()) {
     	    			for( CtParameter<?> myparam :params) {
     	    					
     	    					ResultSet methods = st.executeQuery("SELECT id from methods where methodname='"+method.getSimpleName()+"'"); 
+    	    					CtPath path = method.getPath();
     	    					while(methods.next()){
-    	    						 MethodReferenced = methods.getString("id"); 
+    	    						 MethodReferenced =methods.getString("id"); 
     	    					
     	    			   		   }
     	    				
