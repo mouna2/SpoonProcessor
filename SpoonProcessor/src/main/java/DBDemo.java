@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import spoon.Launcher;
 import spoon.SpoonAPI;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.CtFieldAccess;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.ClassFactory;
 import spoon.reflect.factory.Factory;
@@ -187,7 +190,30 @@ public class DBDemo {
 					"    ON DELETE NO ACTION\r\n" + 
 					"    ON UPDATE NO ACTION);"); 
 			
-		
+		    st.executeUpdate("CREATE TABLE `databasechess`.`methods` (\r\n" + 
+		    		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
+		    		"  `classreferenced` INT NULL,\r\n" + 
+		    		"  `methodname` LONGTEXT NULL,\r\n" + 
+		    		"  PRIMARY KEY (`id`),\r\n" + 
+		    		"  INDEX `classreferenced_idx` (`classreferenced` ASC),\r\n" + 
+		    		"  CONSTRAINT `classreferenced3`\r\n" + 
+		    		"    FOREIGN KEY (`classreferenced`)\r\n" + 
+		    		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+		    		"    ON DELETE NO ACTION\r\n" + 
+		    		"    ON UPDATE NO ACTION);"); 
+		    
+		    st.executeUpdate("CREATE TABLE `databasechess`.`parameters` (\r\n" + 
+		    		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
+		    		"  `parametername` LONGTEXT NULL,\r\n" + 
+		    		"  `methodid` INT NULL,\r\n" + 
+		    		"  PRIMARY KEY (`id`),\r\n" + 
+		    		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
+		    		"  INDEX `methodid_idx` (`methodid` ASC),\r\n" + 
+		    		"  CONSTRAINT `methodid`\r\n" + 
+		    		"    FOREIGN KEY (`methodid`)\r\n" + 
+		    		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
+		    		"    ON DELETE NO ACTION\r\n" + 
+		    		"    ON UPDATE NO ACTION);"); 
 		   Spoon(); 
 		  
 		   
@@ -230,9 +256,10 @@ public class DBDemo {
         /*********************************************************************************************************************************************************************************/	
         /*********************************************************************************************************************************************************************************/	
         /*********************************************************************************************************************************************************************************/	  	
+    	//BUILD CLASSES TABLE 
     	for(CtType<?> clazz : classFactory.getAll()) {
     		
-    	//BUILD CLASSES TABLE 
+    	
     		
 			
 			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
@@ -270,20 +297,20 @@ public class DBDemo {
 if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.java_chess") && clazz.getSuperclass().toString().contains("TestCase")==false) {
     			
     			String superclass= clazz.getSuperclass().toString();
-    			System.out.println(i+"    HERE IS MY SUPERCLASS"+superclass+"AND HERE IS MY SUBCLASS  "+FullClassName);
+    		//	System.out.println(i+"    HERE IS MY SUPERCLASS"+superclass+"AND HERE IS MY SUBCLASS  "+FullClassName);
     		i++; 
     
     					ResultSet sClass = st.executeQuery("SELECT id from classes where classname='"+superclass+"'"); 
     					while(sClass.next()){
     						 superclassQuery= sClass.getString("id"); 
-    						System.out.println("superclass: "+superclassQuery);	
+    			//			System.out.println("superclass: "+superclassQuery);	
     			   		   }
     					
     					
     					ResultSet cClass = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
     					while(cClass.next()){
     						 childclassQuery= cClass.getString("id"); 
-    						System.out.println("subclass: "+childclassQuery);	
+    			//			System.out.println("subclass: "+childclassQuery);	
     			   		   }
     					
     					
@@ -314,7 +341,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
 			Set<CtTypeReference<?>> interfaces = clazz.getSuperInterfaces(); 
 			
 			for(CtTypeReference<?> inter: interfaces) {
-				System.out.println("my interface   "+inter);
+			//	System.out.println("my interface   "+inter);
 				if(inter.toString().contains("java_chess")) {
 					
 					
@@ -322,13 +349,13 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
 
 					while(interfacesclasses.next()){
 						myinterface= interfacesclasses.getString("id"); 
-						System.out.println("interface: "+myinterface);	
+				//		System.out.println("interface: "+myinterface);	
 			   		   }
 					
 					ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
 					while(classesreferenced.next()){
 						myclass= classesreferenced.getString("id"); 
-						System.out.println("class referenced: "+myclass);	
+				//		System.out.println("class referenced: "+myclass);	
 			   		   }
 					
 					
@@ -340,8 +367,6 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
 			
 
     	}
-    	
-    	
     	 /*********************************************************************************************************************************************************************************/	
         /*********************************************************************************************************************************************************************************/	
         /*********************************************************************************************************************************************************************************/	  	
@@ -361,13 +386,13 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
 			for(CtFieldReference<?> field: fields) {
 				
 				//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
-				System.out.println("my field   "+field);
+			//	System.out.println("my field   "+field);
 				
 					
 					ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
 					while(classesreferenced.next()){
 						myclass= classesreferenced.getString("id"); 
-						System.out.println("class referenced: "+myclass);	
+			//			System.out.println("class referenced: "+myclass);	
 			   		   }
 					
 					
@@ -381,5 +406,102 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
 			
 
     	}
+    	/*********************************************************************************************************************************************************************************/	
+        /*********************************************************************************************************************************************************************************/	
+        /*********************************************************************************************************************************************************************************/	  	
+    	//BUILD METHODS TABLE 
+    	
+    	for(CtType<?> clazz : classFactory.getAll()) {
+    		
+    	
+    		String myclass = null;
+    		
+    		
+    		
+			Collection<CtMethod<?>> methods = clazz.getAllMethods(); 
+			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
+			
+			int count = StringUtils.countMatches(clazz.getPackage().toString(), ".");
+			//System.out.println("count:   "+count);
+			//NEEDS TO BE CHANGED 
+			if(count==2) {
+			for(CtMethod<?> method: methods) {
+				String FullMethodName=method.getSimpleName(); 
+				//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
+			//	System.out.println(FullClassName);
+				
+					
+					ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
+					while(classesreferenced.next()){
+						myclass= classesreferenced.getString("id"); 
+				//		System.out.println("class referenced: "+myclass);	
+			   		   }
+					
+				
+					
+						System.out.println(FullClassName);
+		    			st.executeUpdate("INSERT INTO `methods`(`classreferenced`, `methodname`) VALUES ('"+myclass +"','" +FullMethodName+"')");
+
+					}
+
+					
+				
+				
+			}
+			
+			
+		
+			
+		
+    	}
+    	
+    	
+    	
+    	 /*********************************************************************************************************************************************************************************/	
+        /*********************************************************************************************************************************************************************************/	
+        /*********************************************************************************************************************************************************************************/
+    	
+    	//BUILD PARAMETERS TABLE 
+for(CtType<?> clazz : classFactory.getAll()) {
+    		
+    		System.out.println(clazz.getSimpleName());
+    		System.out.println(clazz.getPackage());
+    		String fullname= clazz.getPackage()+""+clazz.getQualifiedName(); 
+    		String MethodReferenced=null; 
+    		String parameter=null; 
+    	
+   
+    		
+    		
+    		 //for(CtField<?> field : clazz.getFields()) {
+    				for(CtMethod<?> method :clazz.getMethods()) {
+    	    			List<CtParameter<?>> params = method.getParameters(); 
+    				
+    	    	
+    	    			for( CtParameter<?> myparam :params) {
+    	    					
+    	    					ResultSet methods = st.executeQuery("SELECT id from methods where methodname='"+method.getSimpleName()+"'"); 
+    	    					while(methods.next()){
+    	    						 MethodReferenced = methods.getString("id"); 
+    	    					
+    	    			   		   }
+    	    				
+    	    					
+    	    				//	if(field.toString().contains("java.awt")==false && field.toString().contains("javax")==false) {
+    	    						System.out.println("HERE IS A PARAMETER: "+ myparam);
+    	    						if(MethodReferenced==null) {
+    	    							System.out.println("HERE IS NULL PARAMETER: "+myparam+"method referenced======>"+MethodReferenced);
+    	    						}
+    	    						if(MethodReferenced!=null)
+    	    		    			st.executeUpdate("INSERT INTO `parameters`(`parametername`, `methodid`) VALUES ('"+myparam +"','" +MethodReferenced+"')");
+
+    	    				//	}
+    	    				
+    	    				
+    	    			}
+    	    		}
+    		 //}
+    	}
+    
 	}
 }
