@@ -21,6 +21,7 @@ import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.ClassFactory;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.factory.MethodFactory;
 import spoon.reflect.path.CtPath;
 import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
@@ -215,6 +216,39 @@ public class DBDemo {
 		    		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		    		"    ON DELETE NO ACTION\r\n" + 
 		    		"    ON UPDATE NO ACTION);"); 
+		    
+		   st.executeUpdate("CREATE TABLE `databasechess`.`superclassesextended` (\r\n" + 
+		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
+		   		"  `superclassid` INT NULL,\r\n" + 
+		   		"  `superclassname` LONGTEXT NULL,\r\n" + 
+		   		"  `childclassid` INT NULL,\r\n" + 
+		   		"  `childclassname` LONGTEXT NULL,\r\n" + 
+		   		"  PRIMARY KEY (`id`),\r\n" + 
+		   		"  INDEX `superclassid_idx` (`superclassid` ASC),\r\n" + 
+		   		"  INDEX `superclassname_idx` (`superclassname` ASC),\r\n" + 
+		   		"  INDEX `childclassid_idx` (`childclassid` ASC),\r\n" + 
+		   		"  INDEX `childclassname_idx` (`childclassname` ASC),\r\n" + 
+		   		"  CONSTRAINT `superclassid`\r\n" + 
+		   		"    FOREIGN KEY (`superclassid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION,\r\n" + 
+		   		"  CONSTRAINT `superclassname`\r\n" + 
+		   		"    FOREIGN KEY (`superclassname`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`classes` (`classname`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION,\r\n" + 
+		   		"  CONSTRAINT `childclassid`\r\n" + 
+		   		"    FOREIGN KEY (`childclassid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION,\r\n" + 
+		   		"  CONSTRAINT `childclassname`\r\n" + 
+		   		"    FOREIGN KEY (`childclassname`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`classes` (`classname`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION);\r\n" + 
+		   		""); 
 		   Spoon(); 
 		  
 		   
@@ -253,6 +287,7 @@ public class DBDemo {
     	// Interact with model
     	Factory factory = spoon.getFactory();
     	ClassFactory classFactory = factory.Class();
+    	MethodFactory methodFactory = factory.Method(); 
     	int i=1; 
         /*********************************************************************************************************************************************************************************/	
         /*********************************************************************************************************************************************************************************/	
@@ -379,12 +414,12 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
     		String myclass = null;
     		
 		
-		
-			Collection<CtFieldReference<?>> fields = clazz.getAllFields(); 
+		//ALTERNATIVE: Collection<CtFieldReference<?>> fields = clazz.getAllFields(); 
+			Collection<CtField<?>> fields = clazz.getFields(); 
 			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
 			
-			
-			for(CtFieldReference<?> field: fields) {
+		//ALTERNATIVE: 	for(CtFieldReference<?> field: fields) {	
+			for(CtField<?> field: fields) {
 				
 				//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
 			//	System.out.println("my field   "+field);
@@ -397,17 +432,17 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
 			   		   }
 					
 					
-					if(field.toString().contains("java.awt")==false && field.toString().contains("javax")==false) {
-		    			st.executeUpdate("INSERT INTO `fieldsclasses`(`fieldname`, `classreferenced`) VALUES ('"+field +"','" +myclass+"')");
+				//	if(field.toString().contains("java.awt")==false && field.toString().contains("javax")==false) {
+		    			st.executeUpdate("INSERT INTO `fieldsclasses`(`fieldname`, `classreferenced`) VALUES ('"+field.getSimpleName() +"','" +myclass+"')");
 
-					}
+				//	}
 				
 				
 			}
 			
 
     	}
-    	
+    
     	/*********************************************************************************************************************************************************************************/	
         /*********************************************************************************************************************************************************************************/	
         /*********************************************************************************************************************************************************************************/	  	
@@ -419,14 +454,14 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
     		String myclass = null;
     		
     		
-    		
-			Collection<CtMethod<?>> methods = clazz.getAllMethods(); 
+    		//ALTERNATIVE: Collection<CtMethod<?>> methods = clazz.getAllMethods(); 
+			Collection<CtMethod<?>> methods = clazz.getMethods(); 
 			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
 			
 			int count = StringUtils.countMatches(clazz.getPackage().toString(), ".");
 			//System.out.println("count:   "+count);
 			//NEEDS TO BE CHANGED 
-			if(count==2) {
+		//	if(count==2) {
 			for(CtMethod<?> method: methods) {
 				String FullMethodName=method.getSimpleName(); 
 				//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
@@ -449,7 +484,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains("de.
 					
 				
 				
-			}
+			//}
 			
 			
 		
