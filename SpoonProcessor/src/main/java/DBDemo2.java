@@ -723,7 +723,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 				
 				st.executeUpdate(statement);
 			}
-			//
+			
 
 		
 		}
