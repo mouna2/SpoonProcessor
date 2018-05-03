@@ -3,9 +3,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -15,6 +15,7 @@ import spoon.Launcher;
 import spoon.SpoonAPI;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.CtFieldAccess;
+import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
@@ -22,10 +23,9 @@ import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.ClassFactory;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.factory.MethodFactory;
-import spoon.reflect.path.CtPath;
-import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.filter.FieldAccessFilter;
+import spoon.reflect.visitor.filter.TypeFilter;
 
 /**
  * This class demonstrates how to connect to MySQL and run some basic commands.
@@ -233,6 +233,41 @@ public class DBDemo2 {
 		   		"  CONSTRAINT `classid4`\r\n" + 
 		   		"    FOREIGN KEY (`classid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION);"); 
+		   st.executeUpdate("CREATE TABLE `databasechess`.`fieldmethods` (\r\n" + 
+		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
+		   		"  `fieldaccess` LONGTEXT NULL,\r\n" + 
+		   		"  `classname` LONGTEXT NULL,\r\n" + 
+		   		"  `classid` INT NULL,\r\n" + 
+		   		"  `methodname` LONGTEXT NULL,\r\n" + 
+		   		"  `methodid` INT NULL,\r\n" + 
+		   		"  PRIMARY KEY (`id`),\r\n" + 
+		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
+		   		"  INDEX `classid_idx` (`classid` ASC),\r\n" + 
+		   		"  INDEX `methodid_idx` (`methodid` ASC),\r\n" + 		
+		   		"  CONSTRAINT `classid5`\r\n" + 
+		   		"    FOREIGN KEY (`classid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION,\r\n" + 
+		   		"  CONSTRAINT `methodid2`\r\n" + 
+		   		"    FOREIGN KEY (`methodid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION);"); 
+		   st.executeUpdate("CREATE TABLE `databasechess`.`methodcalls` (\r\n" + 
+		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
+		   		"  `methodcalled` LONGTEXT NULL,\r\n" + 
+		   		"  `callingmethod` LONGTEXT NULL,\r\n" + 
+		   		"  `callingmethodid` INT NULL,\r\n" + 
+		   		"  `classname` LONGTEXT NULL,\r\n" + 
+		   		"  PRIMARY KEY (`id`),\r\n" + 
+		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
+		   		"  INDEX `callingmethodid_idx` (`callingmethodid` ASC),\r\n" + 
+		   		"  CONSTRAINT `callingmethodid`\r\n" + 
+		   		"    FOREIGN KEY (`callingmethodid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
 		   Spoon(); 
@@ -490,6 +525,11 @@ for(CtType<?> clazz : classFactory.getAll()) {
     				for(CtMethod<?> method :clazz.getMethods()) {
     	    			List<CtParameter<?>> params = method.getParameters(); 
     				
+    	    		
+    	    			
+    	    			if(clazz.getQualifiedName().equals("de.java_chess.javaChess.listener.EngineStatusListener")) {
+    	    				clazz.getQualifiedName();
+    	    			}
     	    	
     	    			for( CtParameter<?> myparam :params) {
     	    					
@@ -572,7 +612,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 	   		   }
 			
 		//	if(field.toString().contains("java.awt")==false && field.toString().contains("javax")==false) {
-    			st.executeUpdate("INSERT INTO `fieldclasses`(`fieldname`, `classid`,  `classname`) VALUES ('"+field +"','" +myclass+"','" +myclassname+"')");
+    			st.executeUpdate("INSERT INTO `fieldclasses`(`fieldname`, `classid`,  `classname`) VALUES ('"+field.getSimpleName() +"','" +myclass+"','" +myclassname+"')");
 
 		//	}
 		
@@ -584,9 +624,89 @@ for(CtType<?> clazz : classFactory.getAll()) {
 /*********************************************************************************************************************************************************************************/	
 /*********************************************************************************************************************************************************************************/	
 /*********************************************************************************************************************************************************************************/   	
-    	
-    	
-    	
+//BUILD FIELDS TABLE -- METHODS
+
+for(CtType<?> clazz : classFactory.getAll()) {
+	String fieldname=null; 
+	String Fieldid=null; 
+	String Methodid=null; 
+	String myclassname=null; 
+	String MethodName=null; 
+	String myclass=null; 
+	String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
+	for(CtMethod<?> method :clazz.getMethods()) {
+		List<CtFieldAccess> list = method.getElements(new TypeFilter<>(CtFieldAccess.class)); 
+		for(CtFieldAccess fieldaccess: list) {
+			
+			ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
+			while(classesreferenced.next()){
+				 myclass = classesreferenced.getString("id"); 
+	//			System.out.println("class referenced: "+myclass);	
+	   		   }
+			ResultSet classnames = st.executeQuery("SELECT classname from classes where classname='"+FullClassName+"'"); 
+			while(classnames.next()){
+				 myclassname = classnames.getString("classname"); 
+	//			System.out.println("class referenced: "+myclass);	
+	   		   }
+			
+			ResultSet methodids = st.executeQuery("SELECT id from methods where methodname='"+method.getSimpleName()+"'"); 
+			
+			while(methodids.next()){
+				  Methodid = methodids.getString("id"); 
+			
+	   		   }
+ResultSet methodnames = st.executeQuery("SELECT methodname from methods where methodname='"+method.getSimpleName()+"'"); 
+			
+			while(methodnames.next()){
+				  MethodName = methodnames.getString("methodname"); 
+			
+	   		   }
+					
+		
+			st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`,  `classname`,  `classid`,  `methodname`, `methodid`) VALUES ('"+fieldaccess.toString() +"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
+
+		}
+	}
+
+
+	
+
+}   	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/   	
+//BUILD METHODSCALLED TABLE
+
+for(CtType<?> clazz : classFactory.getAll()) {
+	
+	for(CtMethod<?> method :clazz.getMethods()) {
+		 List<CtInvocation> methodcalls = method.getElements(new TypeFilter<>(CtInvocation.class)); 
+
+		for( CtInvocation calledmethod: methodcalls) {
+			String callingmethodid=null; 
+			
+			
+			
+			
+			ResultSet callingmethods = st.executeQuery("SELECT id from methods where methodname='"+method.getSimpleName()+"'"); 
+			while(callingmethods.next()){
+				callingmethodid = callingmethods.getString("id"); 
+	//			System.out.println("class referenced: "+myclass);	
+	   		   }
+			 
+		
+			System.out.println("CALLED METHOD "+calledmethod.getExecutable().getSignature().toString() + "\tCLASS2: "+clazz.getQualifiedName()+"\tCALLINGMETHOD: "+method.getSimpleName());
+			String statement = "INSERT INTO `methodcalls`(`methodcalled`,  `callingmethod`,  `callingmethodid`, `classname`) VALUES ('"+calledmethod.getExecutable().getSignature().toString() +"','" +method.getSimpleName()+"','" +callingmethodid+"','" +clazz.getQualifiedName()+"')";
+			st.executeUpdate(statement);
+
+		
+		}
+	}
+
+
+	
+
+}       	
     	
 	}
 }
