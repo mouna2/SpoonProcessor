@@ -632,6 +632,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 	String Methodid=null; 
 	String myclassname=null; 
 	String MethodName=null; 
+	String FieldName=null; 
 	String myclass=null; 
 	String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
 	for(CtMethod<?> method :clazz.getMethods()) {
@@ -662,9 +663,9 @@ ResultSet methodnames = st.executeQuery("SELECT methodname from methods where me
 			
 	   		   }
 					
-		
+			
 			st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`,  `classname`,  `classid`,  `methodname`, `methodid`) VALUES ('"+fieldaccess.toString() +"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
-
+			
 		}
 	}
 
