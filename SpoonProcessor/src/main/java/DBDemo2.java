@@ -223,6 +223,18 @@ public class DBDemo2 {
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION"+   	
 		   		 ")"); 
+		   st.executeUpdate("CREATE TABLE `databasechess`.`fieldclasses` (\r\n" + 
+		   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
+		   		"  `fieldname` LONGTEXT NULL,\r\n" + 
+		   		"  `classid` INT NULL,\r\n" + 
+		   		"  `classname` LONGTEXT NULL,\r\n" + 
+		   		"  PRIMARY KEY (`id`),\r\n" + 
+		   		"  INDEX `classid_idx` (`classid` ASC),\r\n" + 
+		   		"  CONSTRAINT `classid4`\r\n" + 
+		   		"    FOREIGN KEY (`classid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION);"); 
 		   Spoon(); 
 		  
 		   
@@ -525,9 +537,53 @@ for(CtType<?> clazz : classFactory.getAll()) {
     	    		}
     		 //}
     	}
-    	
-    	
-    	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/
+	
+//BUILD FIELDS TABLE -- CLASSES
+for(CtType<?> clazz : classFactory.getAll()) {
+	
+	
+
+	String myclass = null;
+	String myclassname=null; 
+
+//ALTERNATIVE: Collection<CtFieldReference<?>> fields = clazz.getAllFields(); 
+	Collection<CtField<?>> fields = clazz.getFields(); 
+	String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
+	
+//ALTERNATIVE: 	for(CtFieldReference<?> field: fields) {	
+	for(CtField<?> field: fields) {
+		
+		//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
+	//	System.out.println("my field   "+field);
+		
+			
+			ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
+			while(classesreferenced.next()){
+				myclass= classesreferenced.getString("id"); 
+	//			System.out.println("class referenced: "+myclass);	
+	   		   }
+			ResultSet classnames = st.executeQuery("SELECT classname from classes where classname='"+FullClassName+"'"); 
+			while(classnames.next()){
+				myclassname= classnames.getString("classname"); 
+	//			System.out.println("class referenced: "+myclass);	
+	   		   }
+			
+		//	if(field.toString().contains("java.awt")==false && field.toString().contains("javax")==false) {
+    			st.executeUpdate("INSERT INTO `fieldclasses`(`fieldname`, `classid`,  `classname`) VALUES ('"+field +"','" +myclass+"','" +myclassname+"')");
+
+		//	}
+		
+		
+	}
+	
+
+}
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/   	
     	
     	
     	
