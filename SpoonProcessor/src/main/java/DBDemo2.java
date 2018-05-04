@@ -258,13 +258,21 @@ public class DBDemo2 {
 		   		"    ON UPDATE NO ACTION);"); 
 		   st.executeUpdate("CREATE TABLE `databasechess`.`methodcalls` (\r\n" + 
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
-		   		"  `methodcalled` LONGTEXT NULL,\r\n" + 
-		   		"  `callingmethod` LONGTEXT NULL,\r\n" + 
+		   		"  `methodcalledid` INT NULL,\r\n" + 
+		   		"  `methodcalledname` LONGTEXT NULL,\r\n" + 
+		   		"  `methodcalledclass` LONGTEXT NULL,\r\n" + 
 		   		"  `callingmethodid` INT NULL,\r\n" + 
-		   		"  `classname` LONGTEXT NULL,\r\n" + 
+		   		"  `callingmethodname` LONGTEXT NULL,\r\n" + 
+		   		"  `callingmethodclass` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
+		   		"  INDEX `methodcalledid_idx` (`methodcalledid` ASC),\r\n" + 
 		   		"  INDEX `callingmethodid_idx` (`callingmethodid` ASC),\r\n" + 
+		   		"  CONSTRAINT `methodcalledid`\r\n" + 
+		   		"    FOREIGN KEY (`methodcalledid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION,\r\n" + 
 		   		"  CONSTRAINT `callingmethodid`\r\n" + 
 		   		"    FOREIGN KEY (`callingmethodid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
@@ -693,33 +701,55 @@ for(CtType<?> clazz : classFactory.getAll()) {
 			String callingmethodid=null; 
 			String callingmethodsrefinedid=null; 
 			String callingmethodsrefinedname=null; 
-			
-			
-			ResultSet callingmethods = st.executeQuery("SELECT id from methods where methodname='"+method.getSignature().toString()+"'"); 
-			while(callingmethods.next()){
-				callingmethodid = callingmethods.getString("id"); 
-	//			System.out.println("class referenced: "+myclass);	
-	   		   }
-			 
-			System.out.println("=======================>"+calledmethod.getExecutable().getSignature().toString());
+			String callingmethodclass=null; 
+			String calledmethodid=null; 
+			String calledmethodname=null; 
+			String calledmethodclass=null; 
+			//CALLING METHOD ID 
 			ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+calledmethod.getExecutable().getSignature().toString()+"'"); 
 			while(callingmethodsrefined.next()){
 				callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
-	//			System.out.println("class referenced: "+myclass);	
 	   		   }
 			 
-			
+			//CALLING METHOD NAME 
 			ResultSet callingmethodsrefinednames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+calledmethod.getExecutable().getSignature().toString()+"'"); 
 			while(callingmethodsrefinednames.next()){
 				callingmethodsrefinedname = callingmethodsrefinednames.getString("methodname"); 
-	//			System.out.println("class referenced: "+myclass);	
 	   		   }
-			System.out.println("CALLED METHOD "+callingmethodsrefinedname+ "\tCLASS2: "+clazz.getQualifiedName()+"\tCALLINGMETHOD: "+method.getSignature().toString());
+			
+			
+			//CALLING METHOD CLASS 
+			ResultSet callingmethodsclasses = st.executeQuery("SELECT classes.classname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+calledmethod.getExecutable().getSignature().toString()+"'"); 
+			while(callingmethodsclasses.next()){
+				callingmethodclass = callingmethodsclasses.getString("classname"); 
+	   		   }
+			
+			
+			//CALLED METHOD ID 
+			ResultSet calledmethodsids= st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+method.getSignature().toString()+"'"); 
+			while(calledmethodsids.next()){
+				calledmethodid = calledmethodsids.getString("id"); 
+	   		   }
+			 
+			//CALLED METHOD NAME 
+			ResultSet callemethodnames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+method.getSignature().toString()+"'"); 
+			while(callemethodnames.next()){
+				calledmethodname = callemethodnames.getString("methodname"); 
+	   		   }
+			
+			
+			//CALLED METHOD CLASS 
+			ResultSet calledmethodclasses = st.executeQuery("SELECT classes.classname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+method.getSignature().toString()+"'"); 
+			while(calledmethodclasses.next()){
+				calledmethodclass = calledmethodclasses.getString("classname"); 
+	   		   }
+			
+			
+			System.out.println("CALLED METHOD "+calledmethodname+ "\tCLASS2: "+calledmethodclass+"\tCALLINGMETHOD: "+callingmethodsrefinedname+"CALLING MENTHOD CLASS"+callingmethodclass);
 
-			//System.out.println("CALLED METHOD "+calledmethod.getExecutable().getSignature().toString() + "\tCLASS2: "+clazz.getQualifiedName()+"\tCALLINGMETHOD: "+method.getSignature().toString());
-		//	String statement = "INSERT INTO `methodcalls`(`methodcalled`,  `callingmethod`,  `callingmethodid`, `classname`) VALUES ('"+calledmethod.getExecutable().getSignature().toString() +"','" +method.getSignature().toString()+"','" +callingmethodid+"','" +clazz.getQualifiedName()+"')";
-			if(callingmethodsrefinedname!=null && callingmethodsrefinedid!=null) {
-				String statement = "INSERT INTO `methodcalls`(`methodcalled`,  `callingmethod`,  `callingmethodid`, `classname`) VALUES ('"+callingmethodsrefinedname +"','" +method.getSignature().toString()+"','" +callingmethodsrefinedid+"','" +clazz.getQualifiedName()+"')";
+		
+			if(callingmethodsrefinedname!=null && callingmethodsrefinedid!=null && callingmethodclass!=null && calledmethodclass!=null && calledmethodname!=null && calledmethodid!=null) {
+				String statement = "INSERT INTO `methodcalls`(`methodcalledid`,  `methodcalledname`,  `methodcalledclass`,`callingmethodid`,  `callingmethodname`, `callingmethodclass`) VALUES ('"+calledmethodid +"','" +calledmethodname+"','" +calledmethodclass+"','" +callingmethodsrefinedid+"','" +callingmethodsrefinedname+"','" +callingmethodclass+"')";
 				
 				st.executeUpdate(statement);
 			}
