@@ -499,8 +499,42 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 			//System.out.println("count:   "+count);
 			//NEEDS TO BE CHANGED 
 		//	if(count==2) {
+			 List<CtConstructor> MyContructorlist = clazz.getElements(new TypeFilter<>(CtConstructor.class)); 
+			 for(CtConstructor<?> constructor: MyContructorlist) {
+				 
+				 
+					String FullConstructorName=constructor.getSignature().toString(); 
+					//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
+					System.out.println("FULL CONSTRUCTOR NAME BEFORE:"+FullConstructorName);
+					//24 is the size of the string "de.java_chess.javaChess."
+						 FullConstructorName=FullConstructorName.substring(24, FullConstructorName.length()); 
+							System.out.println("FULL CONSTRUCTOR NAME AFTER:"+FullConstructorName);
+
+						ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
+						while(classesreferenced.next()){
+							myclassid= classesreferenced.getString("id"); 
+					//		System.out.println("class referenced: "+myclass);	
+				   		   }
+						ResultSet classnames = st.executeQuery("SELECT classname from classes where classname='"+FullClassName+"'"); 
+						while(classnames.next()){
+							myclassname= classnames.getString("classname"); 
+					//		System.out.println("class referenced: "+myclass);	
+				   		   }
+						
+							System.out.println("FullClassName====="+ FullConstructorName);
+					
+					
+						
+							System.out.println(FullClassName);
+			    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `classid`, `classname`) VALUES ('"+FullConstructorName +"','" +myclassid+"','" +myclassname+"')");
+
+						}
+			 
+			 
+			 
 			for(CtMethod<?> method: methods) {
-				 List<CtConstructor> list = method.getElements(new TypeFilter<>(CtConstructor.class)); 
+				 
+				 
 				String FullMethodName=method.getSignature().toString(); 
 				//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
 			//	System.out.println(FullClassName);
