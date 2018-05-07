@@ -1,3 +1,8 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -16,6 +21,7 @@ import spoon.SpoonAPI;
 import spoon.reflect.CtModel;
 import spoon.reflect.code.CtFieldAccess;
 import spoon.reflect.code.CtInvocation;
+import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
@@ -278,7 +284,23 @@ public class DBDemo2 {
 		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
-		   Spoon(); 
+		   st.executeUpdate("CREATE TABLE `databasechess`.`methodcallsexecuted` (\r\n" + 
+			   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
+			   		"  `methodcalledid` LONGTEXT NULL,\r\n" + 
+			   		"  `methodcalledname` LONGTEXT NULL,\r\n" + 
+			   		"  `methodcalledclass` LONGTEXT NULL,\r\n" + 
+			   		"  `callingmethodid` LONGTEXT NULL,\r\n" + 
+			   		"  `callingmethodname` LONGTEXT NULL,\r\n" + 
+			   		"  `callingmethodclass` LONGTEXT NULL,\r\n" + 
+			   		"  PRIMARY KEY (`id`),\r\n" + 
+			   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC)); " ); 
+		   
+		   try {
+			Spoon();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		  
 		   
 		   
@@ -300,7 +322,7 @@ public class DBDemo2 {
 		app.run();
 	}
 	
-	public void Spoon() throws SQLException {
+	public void Spoon() throws SQLException, FileNotFoundException {
 	DBDemo2 dao = new DBDemo2();
 	Connection conn=getConnection();
 	Statement st= conn.createStatement();
@@ -478,6 +500,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 			//NEEDS TO BE CHANGED 
 		//	if(count==2) {
 			for(CtMethod<?> method: methods) {
+				 List<CtConstructor> list = method.getElements(new TypeFilter<>(CtConstructor.class)); 
 				String FullMethodName=method.getSignature().toString(); 
 				//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
 			//	System.out.println(FullClassName);
@@ -763,6 +786,109 @@ for(CtType<?> clazz : classFactory.getAll()) {
 	
 
 }       	
-    	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/   	
+//BUILD METHODSCALLED TABLE
+File file = new File("C:\\Users\\mouna\\git\\ParseFile\\ParseFile\\src\\data");
+FileReader fileReader = new FileReader(file);
+BufferedReader bufferedReader = new BufferedReader(fileReader);
+StringBuffer stringBuffer = new StringBuffer();
+String line;
+try {
+	while ((line = bufferedReader.readLine()) != null) {
+		String methodsCalling= line.substring(1, line.indexOf("---")); 	
+		String ClassFROM=methodsCalling.substring(0, methodsCalling.lastIndexOf("."));
+		String MethodFROM=methodsCalling.substring(methodsCalling.lastIndexOf(".")+1, methodsCalling.indexOf(")")+1);
+		MethodFROM=MethodFROM.replace("/", "."); 
+		MethodFROM=MethodFROM.replace(";", ""); 
+		MethodFROM=MethodFROM.replace("Lde", "de"); 
+		MethodFROM=MethodFROM.replace("-", ""); 
+		String methodsCalled=line.substring(line.lastIndexOf("---")+5, line.length()-1); 			
+		String ClassTO=methodsCalled.substring(0, methodsCalled.lastIndexOf("."));
+		String MethodTO=methodsCalled.substring(methodsCalled.lastIndexOf(".")+1, methodsCalled.indexOf(")")+1); 
+		MethodTO=MethodTO.replace("/", "."); 
+		MethodTO=MethodTO.replace(";", ""); 
+		MethodTO=MethodTO.replace("Lde", "de"); 
+		MethodTO=MethodTO.replace("-", "");
+		stringBuffer.append("\n");
+		/*stringBuffer2.append("(SELECT MethodsID from Methods \r\n" + 
+				"INNER JOIN Classes \r\n" + 
+				"ON Classes.ClassID=Methods.ClassID\r\n" + 
+				"where Methods.MethodName='"+MethodTO+"'  AND Classes.ClassName='"+ClassTO+"')),"); 
+		stringBuffer2.append("\n");*/
+		//
+		
+		//System.out.println("CLASS FROM: "+ClassFROM+"        METHOD FROM       "+ MethodFROM+ "       CLASS TO       "+ ClassTO+"       Method To       "+MethodTO); 
+		String callingmethodid=null; 
+		String callingmethodsrefinedid=null; 
+		String callingmethodsrefinedname=null; 
+		String callingmethodclass=null; 
+		String calledmethodid=null; 
+		String calledmethodname=null; 
+		String calledmethodclass=null; 
+		//CALLING METHOD ID 
+		ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodFROM+"' "); 
+		while(callingmethodsrefined.next()){
+			callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
+			   }
+		 
+		//CALLING METHOD NAME 
+		ResultSet callingmethodsrefinednames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodFROM+"'"); 
+		while(callingmethodsrefinednames.next()){
+			callingmethodsrefinedname = callingmethodsrefinednames.getString("methodname"); 
+			   }
+		
+		
+		//CALLING METHOD CLASS 
+		ResultSet callingmethodsclasses = st.executeQuery("SELECT classes.classname from classes where classes.classname ='"+ClassFROM+"'"); 
+		while(callingmethodsclasses.next()){
+			callingmethodclass = callingmethodsclasses.getString("classname"); 
+			   }
+		
+		
+		//CALLED METHOD ID 
+		ResultSet calledmethodsids= st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodTO+"'and classes.classname='"+ClassTO+"'"); 
+		while(calledmethodsids.next()){
+			calledmethodid = calledmethodsids.getString("id"); 
+			   }
+		 
+		//CALLED METHOD NAME 
+		ResultSet callemethodnames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodTO+"'"); 
+		while(callemethodnames.next()){
+			calledmethodname = callemethodnames.getString("methodname"); 
+			   }
+		
+		
+		//CALLED METHOD CLASS 
+		ResultSet calledmethodclasses = st.executeQuery("SELECT classes.classname from classes where classes.classname ='"+ClassTO+"'"); 
+		while(calledmethodclasses.next()){
+			calledmethodclass = calledmethodclasses.getString("classname"); 
+			   }
+		
+		
+	
+		System.out.println("CLASS FROM: "+ClassFROM+"        METHOD FROM       "+ MethodFROM+ "       CLASS TO       "+ ClassTO+"       Method To       "+MethodTO+"calling merthod refined id    "+ callingmethodsrefinedid+ "called method id    "+ calledmethodid); 
+	
+		if(callingmethodsrefinedid!=null && callingmethodclass!=null && calledmethodclass!=null && calledmethodname!=null && calledmethodid!=null) {
+			String statement = "INSERT INTO `methodcallsexecuted`(`methodcalledid`,  `methodcalledname`,  `methodcalledclass`,`callingmethodid`,  `callingmethodname`, `callingmethodclass`) VALUES ('"+calledmethodid +"','" +MethodFROM+"','" +ClassFROM+"','" +callingmethodsrefinedid+"','" +MethodTO+"','" +ClassTO+"')";
+			
+			st.executeUpdate(statement);
+		}
+		
+	}
+} catch (IOException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+
+
+
+
+//System.out.println("Contents of file:");
+//System.out.println(stringBuffer.toString());
+
+
 	}
 }
