@@ -823,7 +823,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 /*********************************************************************************************************************************************************************************/	
 /*********************************************************************************************************************************************************************************/	
 /*********************************************************************************************************************************************************************************/   	
-//BUILD METHODSCALLED TABLE
+//BUILD METHODSCALLED EXECUTED TABLE
 File file = new File("C:\\Users\\mouna\\git\\ParseFile\\ParseFile\\src\\data");
 FileReader fileReader = new FileReader(file);
 BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -835,15 +835,29 @@ try {
 		String ClassFROM=methodsCalling.substring(0, methodsCalling.lastIndexOf("."));
 		String MethodFROM=methodsCalling.substring(methodsCalling.lastIndexOf(".")+1, methodsCalling.indexOf(")")+1);
 		MethodFROM=MethodFROM.replace("/", "."); 
-		MethodFROM=MethodFROM.replace(";", ""); 
+		MethodFROM=MethodFROM.replace(";", ", "); 
+		  int endIndex = MethodFROM.lastIndexOf(",");
+		    if (endIndex != -1)  
+		    {
+		    	MethodFROM = MethodFROM.substring(0, endIndex)+")"; // not forgot to put check if(endIndex != -1)
+		    }
 		MethodFROM=MethodFROM.replace("Lde", "de"); 
+		MethodFROM=MethodFROM.replace("Ljava", "java"); 
 		MethodFROM=MethodFROM.replace("-", ""); 
 		String methodsCalled=line.substring(line.lastIndexOf("---")+5, line.length()-1); 			
 		String ClassTO=methodsCalled.substring(0, methodsCalled.lastIndexOf("."));
 		String MethodTO=methodsCalled.substring(methodsCalled.lastIndexOf(".")+1, methodsCalled.indexOf(")")+1); 
 		MethodTO=MethodTO.replace("/", "."); 
-		MethodTO=MethodTO.replace(";", ""); 
+		MethodTO=MethodTO.replace(";", ", "); 
+		MethodTO=MethodTO.replace(";", ", "); 
+		   endIndex = MethodTO.lastIndexOf(",");
+		    if (endIndex != -1)  
+		    {
+		    	MethodTO = MethodTO.substring(0, endIndex)+")"; // not forgot to put check if(endIndex != -1)
+		    }
+		//MethodTO=MethodTO.substring(0, MethodTO.lastIndexOf(",")-2)+")"; 
 		MethodTO=MethodTO.replace("Lde", "de"); 
+		MethodTO=MethodTO.replace("Ljava", "java"); 
 		MethodTO=MethodTO.replace("-", "");
 		stringBuffer.append("\n");
 		/*stringBuffer2.append("(SELECT MethodsID from Methods \r\n" + 
@@ -904,11 +918,11 @@ try {
 	
 		System.out.println("CLASS FROM: "+ClassFROM+"        METHOD FROM       "+ MethodFROM+ "       CLASS TO       "+ ClassTO+"       Method To       "+MethodTO+"calling merthod refined id    "+ callingmethodsrefinedid+ "called method id    "+ calledmethodid); 
 	
-		if(callingmethodsrefinedid!=null && callingmethodclass!=null && calledmethodclass!=null && calledmethodname!=null && calledmethodid!=null) {
-			String statement = "INSERT INTO `methodcallsexecuted`(`methodcalledid`,  `methodcalledname`,  `methodcalledclass`,`callingmethodid`,  `callingmethodname`, `callingmethodclass`) VALUES ('"+calledmethodid +"','" +MethodFROM+"','" +ClassFROM+"','" +callingmethodsrefinedid+"','" +MethodTO+"','" +ClassTO+"')";
+	//	if(callingmethodsrefinedid!=null && callingmethodclass!=null && calledmethodclass!=null && calledmethodname!=null && calledmethodid!=null) {
+			String statement = "INSERT INTO `methodcallsexecuted`(`methodcalledid`,  `methodcalledname`,  `methodcalledclass`,`callingmethodid`,  `callingmethodname`, `callingmethodclass`) VALUES ('"+calledmethodid +"','" +MethodTO+"','" +ClassTO+"','" +callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"')";
 			
 			st.executeUpdate(statement);
-		}
+	//	}
 		
 	}
 } catch (IOException e) {
