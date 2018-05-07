@@ -877,7 +877,7 @@ try {
 		String calledmethodname=null; 
 		String calledmethodclass=null; 
 		//CALLING METHOD ID 
-		ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodFROM+"' "); 
+		ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodFROM+"' and classes.classname='"+ClassFROM+"'"); 
 		while(callingmethodsrefined.next()){
 			callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
 			   }
