@@ -19,8 +19,11 @@ import org.apache.commons.lang3.StringUtils;
 import spoon.Launcher;
 import spoon.SpoonAPI;
 import spoon.reflect.CtModel;
+import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtFieldAccess;
 import spoon.reflect.code.CtInvocation;
+import spoon.reflect.code.CtReturn;
+import spoon.reflect.code.CtStatement;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
@@ -213,6 +216,7 @@ public class DBDemo2 {
 		   		"  `classname` VARCHAR(200) NULL,\r\n" + 
 		   		"  `methodid` INT NULL,\r\n" + 
 		   		"  `methodname` VARCHAR(200) NULL,\r\n" + 
+		   		"  `isreturn` TINYINT NOT NULL,\r\n"+
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
 		   		"  INDEX `classid_idx` (`classid` ASC),\r\n" + 
@@ -633,12 +637,24 @@ for(CtType<?> clazz : classFactory.getAll()) {
     	    							System.out.println("HERE IS NULL PARAMETER: "+myparam+"method referenced======>"+MethodReferenced);
     	    						}
     	    						if(MethodReferenced!=null)
-    	    		    			st.executeUpdate("INSERT INTO `parameters`(`parametername`, `classid`, `classname`, `methodid`, `methodname`) VALUES ('"+myparam +"','" +classid +"','"+ClassName+"','" +MethodReferenced+"','" +method.getSignature().toString()+"')");
+    	    		    			st.executeUpdate("INSERT INTO `parameters`(`parametername`, `classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+myparam +"','" +classid +"','"+ClassName+"','" +MethodReferenced+"','" +method.getSignature().toString()+"','" +0+"')");
 
     	    				//	}
     	    				
     	    				
     	    			}
+    	    			
+    	    			 CtTypeReference<?> methodsimplename = method.getType();  
+    	    			System.out.println("METHOD SIMPLE NAME  "+ methodsimplename);
+    	    			/*List<CtStatement> bodystatements = methodbody.getStatements(); 
+    	    			//List<CtReturn> returnstatement = methodbody.getElements(new TypeFilter<>(CtReturn.class)); 
+    	    		
+    	    				List<CtReturn> returnstatement = methodbody.getElements(new TypeFilter<>(CtReturn.class)); 
+    	    				for(CtReturn ret: returnstatement) {
+    	    					System.out.println("HERE IS RETURN: "+ret.getReturnedExpression().getType());
+    	    					ret.getReturnedExpression().getType(); 
+    	    				
+    	    			}*/
     	    		}
     		 //}
     	}
@@ -843,7 +859,7 @@ try {
 		    }
 		MethodFROM=MethodFROM.replace("Lde", "de"); 
 		MethodFROM=MethodFROM.replace("Ljava", "java"); 
-		MethodFROM=MethodFROM.replace("-", ""); 
+		//MethodFROM=MethodFROM.replace("-", ""); 
 		String methodsCalled=line.substring(line.lastIndexOf("---")+5, line.length()-1); 			
 		String ClassTO=methodsCalled.substring(0, methodsCalled.lastIndexOf("."));
 		String MethodTO=methodsCalled.substring(methodsCalled.lastIndexOf(".")+1, methodsCalled.indexOf(")")+1); 
@@ -858,7 +874,7 @@ try {
 		//MethodTO=MethodTO.substring(0, MethodTO.lastIndexOf(",")-2)+")"; 
 		MethodTO=MethodTO.replace("Lde", "de"); 
 		MethodTO=MethodTO.replace("Ljava", "java"); 
-		MethodTO=MethodTO.replace("-", "");
+		//MethodTO=MethodTO.replace("-", "");
 		stringBuffer.append("\n");
 		/*stringBuffer2.append("(SELECT MethodsID from Methods \r\n" + 
 				"INNER JOIN Classes \r\n" + 
