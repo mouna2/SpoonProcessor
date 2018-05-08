@@ -512,6 +512,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 					System.out.println("FULL CONSTRUCTOR NAME BEFORE:"+FullConstructorName);
 					//24 is the size of the string "de.java_chess.javaChess."
 						 FullConstructorName=FullConstructorName.substring(24, FullConstructorName.length()); 
+						 FullConstructorName="-init-"+FullConstructorName.substring(FullConstructorName.lastIndexOf('('));  
 							System.out.println("FULL CONSTRUCTOR NAME AFTER:"+FullConstructorName);
 
 						ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
@@ -851,7 +852,7 @@ try {
 		String ClassFROM=methodsCalling.substring(0, methodsCalling.lastIndexOf("."));
 		String MethodFROM=methodsCalling.substring(methodsCalling.lastIndexOf(".")+1, methodsCalling.indexOf(")")+1);
 		MethodFROM=MethodFROM.replace("/", "."); 
-		MethodFROM=MethodFROM.replace(";", ", "); 
+		MethodFROM=MethodFROM.replace(";", ","); 
 		  int endIndex = MethodFROM.lastIndexOf(",");
 		    if (endIndex != -1)  
 		    {
@@ -864,7 +865,7 @@ try {
 		String ClassTO=methodsCalled.substring(0, methodsCalled.lastIndexOf("."));
 		String MethodTO=methodsCalled.substring(methodsCalled.lastIndexOf(".")+1, methodsCalled.indexOf(")")+1); 
 		MethodTO=MethodTO.replace("/", "."); 
-		MethodTO=MethodTO.replace(";", ", "); 
+		MethodTO=MethodTO.replace(";", ","); 
 		
 		   endIndex = MethodTO.lastIndexOf(",");
 		    if (endIndex != -1)  
