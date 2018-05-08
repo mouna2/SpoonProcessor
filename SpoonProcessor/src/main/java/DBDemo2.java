@@ -270,7 +270,7 @@ public class DBDemo2 {
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
 		   
-		  // st.executeUpdate("ALTER TABLE `databasechess`.`fieldmethods` ADD CONSTRAINT UNIQUE INDEX id (fieldaccess,classname,classid, methodname, methodid); "); 
+		   st.executeUpdate("ALTER TABLE `databasechess`.`fieldmethods` ADD CONSTRAINT UNIQUE INDEX id (fieldaccess,classname,classid, methodname, methodid); "); 
 
 		   st.executeUpdate("CREATE TABLE `databasechess`.`methodcalls` (\r\n" + 
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
