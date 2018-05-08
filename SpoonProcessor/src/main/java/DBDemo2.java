@@ -245,12 +245,15 @@ public class DBDemo2 {
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
+		   
+
+		   
 		   st.executeUpdate("CREATE TABLE `databasechess`.`fieldmethods` (\r\n" + 
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
-		   		"  `fieldaccess` LONGTEXT NULL,\r\n" + 
-		   		"  `classname` LONGTEXT NULL,\r\n" + 
+		   		"  `fieldaccess` VARCHAR(200) NULL,\r\n" + 
+		   		"  `classname` VARCHAR(200) NULL,\r\n" + 
 		   		"  `classid` INT NULL,\r\n" + 
-		   		"  `methodname` LONGTEXT NULL,\r\n" + 
+		   		"  `methodname` VARCHAR(200) NULL,\r\n" + 
 		   		"  `methodid` INT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
@@ -266,6 +269,9 @@ public class DBDemo2 {
 		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
+		   
+		  // st.executeUpdate("ALTER TABLE `databasechess`.`fieldmethods` ADD CONSTRAINT UNIQUE INDEX id (fieldaccess,classname,classid, methodname, methodid); "); 
+
 		   st.executeUpdate("CREATE TABLE `databasechess`.`methodcalls` (\r\n" + 
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `methodcalledid` INT NULL,\r\n" + 
