@@ -849,7 +849,7 @@ try {
 		String MethodTO=methodsCalled.substring(methodsCalled.lastIndexOf(".")+1, methodsCalled.indexOf(")")+1); 
 		MethodTO=MethodTO.replace("/", "."); 
 		MethodTO=MethodTO.replace(";", ", "); 
-		MethodTO=MethodTO.replace(";", ", "); 
+		
 		   endIndex = MethodTO.lastIndexOf(",");
 		    if (endIndex != -1)  
 		    {
