@@ -645,8 +645,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
     	    				
     	    			}
     	    			
-    	    			 CtTypeReference<?> methodsimplename = method.getType();  
-    	    			System.out.println("METHOD SIMPLE NAME  "+ methodsimplename);
+    	    		
     	    			/*List<CtStatement> bodystatements = methodbody.getStatements(); 
     	    			//List<CtReturn> returnstatement = methodbody.getElements(new TypeFilter<>(CtReturn.class)); 
     	    		
@@ -656,6 +655,15 @@ for(CtType<?> clazz : classFactory.getAll()) {
     	    					ret.getReturnedExpression().getType(); 
     	    				
     	    			}*/
+    	    			
+    	    			CtTypeReference<?> MethodType = method.getType();  
+     	    			System.out.println("METHOD TYPE  "+ MethodType);
+     	    			
+     	    			
+    	    			if(MethodReferenced!=null)
+    		    			st.executeUpdate("INSERT INTO `parameters`(`parametername`, `classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+MethodType +"','" +classid +"','"+ClassName+"','" +MethodReferenced+"','" +method.getSignature().toString()+"','" +1+"')");
+
+    	    		
     	    		}
     		 //}
     	}
