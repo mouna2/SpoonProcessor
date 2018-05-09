@@ -200,6 +200,7 @@ public class DBDemo2 {
 		   st.executeUpdate("CREATE TABLE `databasechess`.`methods` (\r\n" + 
 		   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `methodname` LONGTEXT NULL,\r\n" + 
+		   		"  `methodabbreviation` LONGTEXT NULL,\r\n" + 
 		   		"  `classid` INT NULL,\r\n" + 
 		   		"  `classname` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
@@ -534,13 +535,18 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 			 List<CtConstructor> MyContructorlist = clazz.getElements(new TypeFilter<>(CtConstructor.class)); 
 			 for(CtConstructor<?> constructor: MyContructorlist) {
 				 
-				 
+				 	
 					String FullConstructorName=constructor.getSignature().toString(); 
+					String methodabbreviation=FullConstructorName.substring(0, FullConstructorName.indexOf("(")); 
+					 methodabbreviation=methodabbreviation.substring(0, methodabbreviation.lastIndexOf(".")+1)+"-init-"; 
+
+					System.out.println("FULL CONSTRUCTOR NAME BEFORE METHOD ABBREVIATION:"+methodabbreviation);
+
 					//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
-					System.out.println("FULL CONSTRUCTOR NAME BEFORE:"+FullConstructorName);
 					//24 is the size of the string "de.java_chess.javaChess."
 						FullConstructorName=FullConstructorName.substring(24, FullConstructorName.length()); 
 						FullConstructorName="-init-"+FullConstructorName.substring(FullConstructorName.lastIndexOf('('));  
+						
 							System.out.println("FULL CONSTRUCTOR NAME AFTER:"+FullConstructorName);
 
 						ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
@@ -561,7 +567,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 							System.out.println(FullClassName);
 							methods meth= new methods(FullConstructorName, myclassid, myclassname); 
 							if(meth.contains(mymethodlist, meth)==false ) {
-				    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `classid`, `classname`) VALUES ('"+FullConstructorName +"','" +myclassid+"','" +myclassname+"')");
+				    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `methodabbreviation`,`classid`, `classname`) VALUES ('"+FullConstructorName +"','" +methodabbreviation+"','" +myclassid+"','" +myclassname+"')");
 
 								
 				    			mymethodlist.add(meth); 
@@ -579,7 +585,8 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 				//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
 			//	System.out.println(FullClassName);
 				
-					
+				String methodabbreviation= clazz.getQualifiedName()+FullMethodName; 
+				methodabbreviation=methodabbreviation.substring(0, methodabbreviation.indexOf("(")); 
 					ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
 					while(classesreferenced.next()){
 						myclassid= classesreferenced.getString("id"); 
@@ -595,9 +602,9 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 				
 					
 						System.out.println(FullClassName);
-						methods meth= new methods(FullMethodName, myclassid, myclassname); 
+						methods meth= new methods(methodabbreviation, myclassid, myclassname); 
 						if(meth.contains(mymethodlist, meth)==false ) {
-			    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `classid`, `classname`) VALUES ('"+FullMethodName +"','" +myclassid+"','" +myclassname+"')");
+			    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+FullMethodName +"','" +methodabbreviation+"','" +myclassid+"','" +myclassname+"')");
 
 							
 			    			mymethodlist.add(meth); 
