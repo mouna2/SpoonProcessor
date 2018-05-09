@@ -906,40 +906,40 @@ for(CtType<?> clazz : classFactory.getAll()) {
 			String calledmethodname=null; 
 			String calledmethodclass=null; 
 			//CALLING METHOD ID 
-			ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+calledmethod.getExecutable().getSignature().toString()+"'"); 
+			ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+calledmethod.getExecutable().getSignature().toString()+"' and classes.classname='"+  clazz.getQualifiedName() +"'"); 
 			while(callingmethodsrefined.next()){
 				callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
 	   		   }
 			 
 			//CALLING METHOD NAME 
-			ResultSet callingmethodsrefinednames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+calledmethod.getExecutable().getSignature().toString()+"'"); 
+			ResultSet callingmethodsrefinednames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+calledmethod.getExecutable().getSignature().toString()+"' and classes.classname='"+  clazz.getQualifiedName() +"'"); 
 			while(callingmethodsrefinednames.next()){
 				callingmethodsrefinedname = callingmethodsrefinednames.getString("methodname"); 
 	   		   }
 			
 			
 			//CALLING METHOD CLASS 
-			ResultSet callingmethodsclasses = st.executeQuery("SELECT classes.classname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+calledmethod.getExecutable().getSignature().toString()+"'"); 
+			ResultSet callingmethodsclasses = st.executeQuery("SELECT classes.classname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+calledmethod.getExecutable().getSignature().toString()+"' and classes.classname='"+  clazz.getQualifiedName() +"'"); 
 			while(callingmethodsclasses.next()){
 				callingmethodclass = callingmethodsclasses.getString("classname"); 
 	   		   }
 			
 			
 			//CALLED METHOD ID 
-			ResultSet calledmethodsids= st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+method.getSignature().toString()+"'"); 
+			ResultSet calledmethodsids= st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+method.getSignature().toString()+"' and classes.classname='"+  clazz.getQualifiedName() +"'"); 
 			while(calledmethodsids.next()){
 				calledmethodid = calledmethodsids.getString("id"); 
 	   		   }
 			 
 			//CALLED METHOD NAME 
-			ResultSet callemethodnames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+method.getSignature().toString()+"'"); 
+			ResultSet callemethodnames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+method.getSignature().toString()+"' and classes.classname='"+  clazz.getQualifiedName() +"'"); 
 			while(callemethodnames.next()){
 				calledmethodname = callemethodnames.getString("methodname"); 
 	   		   }
 			
 			
 			//CALLED METHOD CLASS 
-			ResultSet calledmethodclasses = st.executeQuery("SELECT classes.classname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+method.getSignature().toString()+"'"); 
+			ResultSet calledmethodclasses = st.executeQuery("SELECT classes.classname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+method.getSignature().toString()+"' and classes.classname='"+  clazz.getQualifiedName() +"'"); 
 			while(calledmethodclasses.next()){
 				calledmethodclass = calledmethodclasses.getString("classname"); 
 	   		   }
