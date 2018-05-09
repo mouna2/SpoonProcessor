@@ -213,6 +213,8 @@ public class DBDemo2 {
 		   st.executeUpdate("CREATE TABLE `databasechess`.`parameters` (\r\n" + 
 		   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `parametername` VARCHAR(200) NULL,\r\n" + 
+		   		"  `parametertype` VARCHAR(200) NULL,\r\n" + 
+		   		"  `parameterclass` INT NULL,\r\n" + 
 		   		"  `classid` INT NULL,\r\n" + 
 		   		"  `classname` VARCHAR(200) NULL,\r\n" + 
 		   		"  `methodid` INT NULL,\r\n" + 
@@ -223,6 +225,11 @@ public class DBDemo2 {
 		   		"  INDEX `classid_idx` (`classid` ASC),\r\n" + 
 		   		"  INDEX `methodid_idx` (`methodid` ASC),\r\n" + 
 		   		"  CONSTRAINT cons UNIQUE (id, parametername, classid, classname, methodname), \r\n"+
+		   		"  CONSTRAINT `classid8`\r\n" + 
+		   		"    FOREIGN KEY (`classid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION,\r\n" + 
 		   		"  CONSTRAINT `classid3`\r\n" + 
 		   		"    FOREIGN KEY (`classid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
@@ -625,18 +632,19 @@ for(CtType<?> clazz : classFactory.getAll()) {
     		String parameter=null; 
     	    String ClassName=null; 
     	    String classid=null; 
-    		
-    		
+    		String parameterclass=null; 
+    		String paramclassid=null; 
+    				
     		 //for(CtField<?> field : clazz.getFields()) {
     				for(CtMethod<?> method :clazz.getMethods()) {
     	    			List<CtParameter<?>> params = method.getParameters(); 
     				
-    	    		
+    	    			
     	    			
     	    		
     	    	
     	    			for( CtParameter<?> myparam :params) {
-    	    				
+    	    				boolean flag2=false; 
     	    				
     	    				ResultSet classnames = st.executeQuery("SELECT classes.classname from classes INNER JOIN methods ON classes.id=methods.classid where methods.methodname='"+method.getSignature().toString()+"' "); 
     	    				
@@ -659,7 +667,13 @@ for(CtType<?> clazz : classFactory.getAll()) {
     	    					
     	    			   		   }
     	    				
+    	    					ResultSet paramclassids = st.executeQuery("SELECT classes.id from classes where classes.classname='"+myparam.getType()+"'"); 
+        	    				
+    	    					while(paramclassids.next()){
+    	    						flag2=true; 
+    	    						paramclassid =paramclassids.getString("id"); 
     	    					
+    	    			   		   }
     	    			
     	    				
     	    					
@@ -670,8 +684,8 @@ for(CtType<?> clazz : classFactory.getAll()) {
     	    						if(MethodReferenced==null) {
     	    							System.out.println("HERE IS NULL PARAMETER: "+myparam+"method referenced======>"+MethodReferenced);
     	    						}
-    	    						if(MethodReferenced!=null)
-    	    		    			st.executeUpdate("INSERT INTO `parameters`(`parametername`, `classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+myparam +"','" +classid +"','"+ClassName+"','" +MethodReferenced+"','" +method.getSignature().toString()+"','" +0+"')");
+    	    						if(MethodReferenced!=null && flag2==true)
+    	    		    			st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+myparam +"','" +myparam.getType() +"','"+paramclassid+"','"+classid +"','"+ClassName+"','" +MethodReferenced+"','" +method.getSignature().toString()+"','" +0+"')");
 
     	    				//	}
     	    				
@@ -688,7 +702,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
     	    					ret.getReturnedExpression().getType(); 
     	    				
     	    			}*/
-    	    			
+    	    			boolean flag=false; 
     	    			CtTypeReference<?> MethodType = method.getType();  
      	    			System.out.println("METHOD TYPE  "+ MethodType);
      	    			ResultSet classnames = st.executeQuery("SELECT classes.classname from classes INNER JOIN methods ON classes.id=methods.classid where methods.methodname='"+method.getSignature().toString()+"' "); 
@@ -713,9 +727,17 @@ for(CtType<?> clazz : classFactory.getAll()) {
 	    			   		   }
 	    				
 	    					
+	    					
+	    					ResultSet parameterclasses = st.executeQuery("SELECT classes.id from classes where classes.classname='"+MethodType+"'"); 
+		    				
+	    					while(parameterclasses.next()){
+	    						parameterclass =parameterclasses.getString("id"); 
+	    						flag=true; 
+	    					
+	    			   		   }
      	    			
-    	    			if(MethodReferenced!=null)
-    		    			st.executeUpdate("INSERT INTO `parameters`(`parametername`, `classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+MethodType +"','" +classid +"','"+ClassName+"','" +MethodReferenced+"','" +method.getSignature().toString()+"','" +1+"')");
+    	    			if(MethodReferenced!=null && flag==true)
+    		    			st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+MethodType +"','" +MethodType+"','" +parameterclass +"','" +classid +"','"+ClassName+"','" +MethodReferenced+"','" +method.getSignature().toString()+"','" +1+"')");
 
     	    		
     	    		}
