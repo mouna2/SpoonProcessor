@@ -518,7 +518,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 					System.out.println("FULL CONSTRUCTOR NAME BEFORE:"+FullConstructorName);
 					//24 is the size of the string "de.java_chess.javaChess."
 						FullConstructorName=FullConstructorName.substring(24, FullConstructorName.length()); 
-						//======================================================FullConstructorName="-init-"+FullConstructorName.substring(FullConstructorName.lastIndexOf('('));  
+						FullConstructorName="-init-"+FullConstructorName.substring(FullConstructorName.lastIndexOf('('));  
 							System.out.println("FULL CONSTRUCTOR NAME AFTER:"+FullConstructorName);
 
 						ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
@@ -883,11 +883,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 			
 			
 			
-			if(callingmethodsrefinedname!=null && callingmethodsrefinedid!=null && callingmethodclass!=null && calledmethodclass!=null && calledmethodname!=null && calledmethodid!=null) {
-				String statement = "INSERT INTO `methodcalls`(`methodcalledid`,  `methodcalledname`,  `methodcalledclass`,`callingmethodid`,  `callingmethodname`, `callingmethodclass`) VALUES ('"+calledmethodid +"','" +calledmethodname+"','" +calledmethodclass+"','" +callingmethodsrefinedid+"','" +callingmethodsrefinedname+"','" +callingmethodclass+"')";
-				
-				st.executeUpdate(statement);
-			}
+			
 			
 
 		
