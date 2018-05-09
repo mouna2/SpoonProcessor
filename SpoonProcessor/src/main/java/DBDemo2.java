@@ -494,7 +494,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
         /*********************************************************************************************************************************************************************************/	
         /*********************************************************************************************************************************************************************************/	  	
     	//BUILD METHODS TABLE 
-    	
+    	List<methods> mymethodlist = new ArrayList<methods>(); 
     	for(CtType<?> clazz : classFactory.getAll()) {
     		
     	
@@ -537,7 +537,14 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 					
 						
 							System.out.println(FullClassName);
-			    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `classid`, `classname`) VALUES ('"+FullConstructorName +"','" +myclassid+"','" +myclassname+"')");
+							methods meth= new methods(FullConstructorName, myclassid, myclassname); 
+							if(meth.contains(mymethodlist, meth)==false ) {
+				    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `classid`, `classname`) VALUES ('"+FullConstructorName +"','" +myclassid+"','" +myclassname+"')");
+
+								
+				    			mymethodlist.add(meth); 
+							}
+						
 
 						}
 			 
@@ -566,7 +573,15 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 				
 					
 						System.out.println(FullClassName);
-		    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `classid`, `classname`) VALUES ('"+FullMethodName +"','" +myclassid+"','" +myclassname+"')");
+						methods meth= new methods(FullMethodName, myclassid, myclassname); 
+						if(meth.contains(mymethodlist, meth)==false ) {
+			    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `classid`, `classname`) VALUES ('"+FullMethodName +"','" +myclassid+"','" +myclassname+"')");
+
+							
+			    			mymethodlist.add(meth); 
+						}
+						
+						
 
 					}
 
