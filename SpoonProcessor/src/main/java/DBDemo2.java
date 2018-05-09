@@ -238,7 +238,7 @@ public class DBDemo2 {
 		   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `fieldname` LONGTEXT NULL,\r\n" + 
 		   		"  `fieldid` INT NULL,\r\n" + 
-		   		"  `type` LONGTEXT NULL,\r\n" + 
+		   		"  `fieldtype` LONGTEXT NULL,\r\n" + 
 		   		"  `classid` INT NULL,\r\n" + 
 		   		"  `classname` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
@@ -261,7 +261,7 @@ public class DBDemo2 {
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `fieldaccess` VARCHAR(200) NULL,\r\n" + 
 		   		"  `fieldid` INT NULL,\r\n" + 
-		   		"  `type` LONGTEXT NULL,\r\n" + 
+		   		"  `fieldtype` LONGTEXT NULL,\r\n" + 
 		   		"  `classname` VARCHAR(200) NULL,\r\n" + 
 		   		"  `classid` INT NULL,\r\n" + 
 		   		"  `methodname` VARCHAR(200) NULL,\r\n" + 
@@ -764,7 +764,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 			
 		//	if(field.toString().contains("java.awt")==false && field.toString().contains("javax")==false) {
 			if(fieldid!=null && flag==true) {
-    			st.executeUpdate("INSERT INTO `fieldclasses`(`fieldname`, `fieldid`, `type`, `classid`,  `classname`) VALUES ('"+field.getSimpleName() +"','"+fieldid +"','"+field.getType() +"','" +myclass+"','" +myclassname+"')");
+    			st.executeUpdate("INSERT INTO `fieldclasses`(`fieldname`, `fieldid`, `fieldtype`, `classid`,  `classname`) VALUES ('"+field.getSimpleName() +"','"+fieldid +"','"+field.getType() +"','" +myclass+"','" +myclassname+"')");
 
 			}
 
@@ -843,7 +843,7 @@ ResultSet methodnames = st.executeQuery("SELECT methodname from methods where me
 		
 			
 				if(myfield.contains(FieldMethodsList, myfield)==false && FieldName!=null && flag==true) {
-					st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`, `fieldid`, `type`,  `classname`,  `classid`,  `methodname`, `methodid`) VALUES ('"+FieldName +"','" +fieldid+"','" +fieldaccess.getType()+"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
+					st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`, `fieldid`, `fieldtype`,  `classname`,  `classid`,  `methodname`, `methodid`) VALUES ('"+FieldName +"','" +fieldid+"','" +fieldaccess.getType()+"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
 					FieldMethodsList.add(myfield); 
 				}
 			
