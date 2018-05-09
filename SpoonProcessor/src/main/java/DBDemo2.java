@@ -237,12 +237,20 @@ public class DBDemo2 {
 		   st.executeUpdate("CREATE TABLE `databasechess`.`fieldclasses` (\r\n" + 
 		   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `fieldname` LONGTEXT NULL,\r\n" + 
+		   		"  `fieldid` INT NULL,\r\n" + 
+		   		"  `type` LONGTEXT NULL,\r\n" + 
 		   		"  `classid` INT NULL,\r\n" + 
 		   		"  `classname` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  INDEX `classid_idx` (`classid` ASC),\r\n" + 
+		   		"  INDEX `classid_idx2` (`classid` ASC),\r\n" + 	
 		   		"  CONSTRAINT `classid4`\r\n" + 
 		   		"    FOREIGN KEY (`classid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION,"+ 
+		   		"  CONSTRAINT `classid6`\r\n" + 
+		   		"    FOREIGN KEY (`fieldid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
@@ -252,6 +260,8 @@ public class DBDemo2 {
 		   st.executeUpdate("CREATE TABLE `databasechess`.`fieldmethods` (\r\n" + 
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `fieldaccess` VARCHAR(200) NULL,\r\n" + 
+		   		"  `fieldid` INT NULL,\r\n" + 
+		   		"  `type` LONGTEXT NULL,\r\n" + 
 		   		"  `classname` VARCHAR(200) NULL,\r\n" + 
 		   		"  `classid` INT NULL,\r\n" + 
 		   		"  `methodname` VARCHAR(200) NULL,\r\n" + 
@@ -262,6 +272,11 @@ public class DBDemo2 {
 		   		"  INDEX `methodid_idx` (`methodid` ASC),\r\n" + 		
 		   		"  CONSTRAINT `classid5`\r\n" + 
 		   		"    FOREIGN KEY (`classid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION,\r\n" + 
+		   		"  CONSTRAINT `classid7`\r\n" + 
+		   		"    FOREIGN KEY (`fieldid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION,\r\n" + 
@@ -714,17 +729,17 @@ for(CtType<?> clazz : classFactory.getAll()) {
 for(CtType<?> clazz : classFactory.getAll()) {
 	
 	
-
+	
 	String myclass = null;
 	String myclassname=null; 
-
+	String fieldid=null; 
 //ALTERNATIVE: Collection<CtFieldReference<?>> fields = clazz.getAllFields(); 
 	Collection<CtField<?>> fields = clazz.getFields(); 
 	String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
 	
 //ALTERNATIVE: 	for(CtFieldReference<?> field: fields) {	
 	for(CtField<?> field: fields) {
-		
+		boolean flag=false; 
 		//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
 	//	System.out.println("my field   "+field);
 		
@@ -740,8 +755,18 @@ for(CtType<?> clazz : classFactory.getAll()) {
 	//			System.out.println("class referenced: "+myclass);	
 	   		   }
 			
+			ResultSet fieldids = st.executeQuery("SELECT id from classes where classname='"+field.getType()+"'"); 
+			while(fieldids.next()){
+				flag=true; 
+				fieldid= fieldids.getString("id"); 
+	//			System.out.println("class referenced: "+myclass);	
+	   		   }
+			
 		//	if(field.toString().contains("java.awt")==false && field.toString().contains("javax")==false) {
-    			st.executeUpdate("INSERT INTO `fieldclasses`(`fieldname`, `classid`,  `classname`) VALUES ('"+field.getSimpleName() +"','" +myclass+"','" +myclassname+"')");
+			if(fieldid!=null && flag==true) {
+    			st.executeUpdate("INSERT INTO `fieldclasses`(`fieldname`, `fieldid`, `type`, `classid`,  `classname`) VALUES ('"+field.getSimpleName() +"','"+fieldid +"','"+field.getType() +"','" +myclass+"','" +myclassname+"')");
+
+			}
 
 		//	}
 		
@@ -763,6 +788,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 	String MethodName=null; 
 	String FieldName=null; 
 	String myclass=null; 
+	String fieldid=null; 
 	String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName();
 	List<fieldmethod> FieldMethodsList= new ArrayList<fieldmethod>(); 
 	
@@ -770,6 +796,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 	for(CtMethod<?> method :clazz.getMethods()) {
 		List<CtFieldAccess> list = method.getElements(new TypeFilter<>(CtFieldAccess.class)); 
 		for(CtFieldAccess fieldaccess: list) {
+			boolean flag=false; 
 			ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
 			while(classesreferenced.next()){
 				 myclass = classesreferenced.getString("id"); 
@@ -800,11 +827,23 @@ ResultSet methodnames = st.executeQuery("SELECT methodname from methods where me
 				  MethodName = methodnames.getString("methodname"); 
 			
 	   		   }
+			
+			ResultSet fieldids = st.executeQuery("SELECT id from classes where classname='"+fieldaccess.getType()+"'"); 
+			while(fieldids.next()){
+				flag=true; 
+				fieldid= fieldids.getString("id"); 
+	//			System.out.println("class referenced: "+myclass);	
+	   		   }
+			
+			
+			
+			
+			
 			fieldmethod myfield= new fieldmethod(FieldName, myclassname, myclass, MethodName, Methodid); 
 		
 			
-				if(myfield.contains(FieldMethodsList, myfield)==false && FieldName!=null) {
-					st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`,  `classname`,  `classid`,  `methodname`, `methodid`) VALUES ('"+FieldName +"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
+				if(myfield.contains(FieldMethodsList, myfield)==false && FieldName!=null && flag==true) {
+					st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`, `fieldid`, `type`,  `classname`,  `classid`,  `methodname`, `methodid`) VALUES ('"+FieldName +"','" +fieldid+"','" +fieldaccess.getType()+"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
 					FieldMethodsList.add(myfield); 
 				}
 			
