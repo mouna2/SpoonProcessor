@@ -200,6 +200,7 @@ public class DBDemo2 {
 		   st.executeUpdate("CREATE TABLE `databasechess`.`methods` (\r\n" + 
 		   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `methodname` LONGTEXT NULL,\r\n" + 
+		   		"  `methodnamerefined` LONGTEXT NULL,\r\n" + 
 		   		"  `methodabbreviation` LONGTEXT NULL,\r\n" + 
 		   		"  `classid` INT NULL,\r\n" + 
 		   		"  `classname` LONGTEXT NULL,\r\n" + 
@@ -537,6 +538,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 				 
 				 	
 					String FullConstructorName=constructor.getSignature().toString(); 
+					
 					String methodabbreviation=FullConstructorName.substring(0, FullConstructorName.indexOf("(")); 
 					 methodabbreviation=methodabbreviation.substring(0, methodabbreviation.lastIndexOf(".")+1)+"-init-"; 
 
@@ -562,12 +564,12 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 						
 							System.out.println("FullClassName====="+ FullConstructorName);
 					
-					
+							String FullMethodNameRefined=FullConstructorName.substring(0, FullConstructorName.indexOf("(")); 
 						
 							System.out.println(FullClassName);
 							methods meth= new methods(FullConstructorName, myclassid, myclassname); 
 							if(meth.contains(mymethodlist, meth)==false ) {
-				    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `methodabbreviation`,`classid`, `classname`) VALUES ('"+FullConstructorName +"','" +methodabbreviation+"','" +myclassid+"','" +myclassname+"')");
+				    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `methodnamerefined`, `methodabbreviation`,`classid`, `classname`) VALUES ('"+FullConstructorName+"','" +FullMethodNameRefined +"','" +methodabbreviation+"','" +myclassid+"','" +myclassname+"')");
 
 								
 				    			mymethodlist.add(meth); 
@@ -584,8 +586,8 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 				String FullMethodName=method.getSignature().toString(); 
 				//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
 			//	System.out.println(FullClassName);
-				
-				String methodabbreviation= clazz.getQualifiedName()+FullMethodName; 
+				String FullMethodNameRefined=FullMethodName.substring(0, FullMethodName.indexOf("(")); 
+				String methodabbreviation= clazz.getQualifiedName()+"."+FullMethodName; 
 				methodabbreviation=methodabbreviation.substring(0, methodabbreviation.indexOf("(")); 
 					ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
 					while(classesreferenced.next()){
@@ -604,7 +606,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 						System.out.println(FullClassName);
 						methods meth= new methods(methodabbreviation, myclassid, myclassname); 
 						if(meth.contains(mymethodlist, meth)==false ) {
-			    			st.executeUpdate("INSERT INTO `methods`(`methodname`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+FullMethodName +"','" +methodabbreviation+"','" +myclassid+"','" +myclassname+"')");
+			    			st.executeUpdate("INSERT INTO `methods`(`methodname`,  `methodnamerefined`,`methodabbreviation`, `classid`, `classname`) VALUES ('"+FullMethodName +"','" +FullMethodNameRefined+"','" +methodabbreviation+"','" +myclassid+"','" +myclassname+"')");
 
 							
 			    			mymethodlist.add(meth); 
@@ -1033,8 +1035,11 @@ try {
 		String calledmethodid=null; 
 		String calledmethodname=null; 
 		String calledmethodclass=null; 
+		
+		String MethodFROMTransformed= MethodFROM.substring(0, MethodFROM.indexOf("(")); 
+		String MethodTOTransformed= MethodTO.substring(0, MethodTO.indexOf("(")); 
 		//CALLING METHOD ID 
-		ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodFROM+"' and classes.classname='"+ClassFROM+"'"); 
+		ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodFROMTransformed+"' and classes.classname='"+ClassFROM+"'"); 
 		while(callingmethodsrefined.next()){
 			callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
 			   }
@@ -1054,7 +1059,7 @@ try {
 		
 		
 		//CALLED METHOD ID 
-		ResultSet calledmethodsids= st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodTO+"'and classes.classname='"+ClassTO+"'"); 
+		ResultSet calledmethodsids= st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodTOTransformed+"'and classes.classname='"+ClassTO+"'"); 
 		while(calledmethodsids.next()){
 			calledmethodid = calledmethodsids.getString("id"); 
 			   }
