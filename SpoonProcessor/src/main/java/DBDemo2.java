@@ -8,6 +8,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -270,7 +271,6 @@ public class DBDemo2 {
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
 		   
-		   st.executeUpdate("ALTER TABLE `databasechess`.`fieldmethods` ADD CONSTRAINT UNIQUE INDEX id (fieldaccess,classname,classid, methodname, methodid); "); 
 
 		   st.executeUpdate("CREATE TABLE `databasechess`.`methodcalls` (\r\n" + 
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
@@ -517,8 +517,8 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 					//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
 					System.out.println("FULL CONSTRUCTOR NAME BEFORE:"+FullConstructorName);
 					//24 is the size of the string "de.java_chess.javaChess."
-						 FullConstructorName=FullConstructorName.substring(24, FullConstructorName.length()); 
-						 FullConstructorName="-init-"+FullConstructorName.substring(FullConstructorName.lastIndexOf('('));  
+						FullConstructorName=FullConstructorName.substring(24, FullConstructorName.length()); 
+						FullConstructorName="-init-"+FullConstructorName.substring(FullConstructorName.lastIndexOf('('));  
 							System.out.println("FULL CONSTRUCTOR NAME AFTER:"+FullConstructorName);
 
 						ResultSet classesreferenced = st.executeQuery("SELECT id from classes where classname='"+FullClassName+"'"); 
@@ -730,7 +730,10 @@ for(CtType<?> clazz : classFactory.getAll()) {
 	String MethodName=null; 
 	String FieldName=null; 
 	String myclass=null; 
-	String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
+	String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName();
+	List<fieldmethod> FieldMethodsList= new ArrayList<fieldmethod>(); 
+	
+	
 	for(CtMethod<?> method :clazz.getMethods()) {
 		List<CtFieldAccess> list = method.getElements(new TypeFilter<>(CtFieldAccess.class)); 
 		for(CtFieldAccess fieldaccess: list) {
@@ -764,8 +767,16 @@ ResultSet methodnames = st.executeQuery("SELECT methodname from methods where me
 				  MethodName = methodnames.getString("methodname"); 
 			
 	   		   }
-			if(FieldName!=null)
-			st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`,  `classname`,  `classid`,  `methodname`, `methodid`) VALUES ('"+FieldName +"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
+			fieldmethod myfield= new fieldmethod(FieldName, myclassname, myclass, MethodName, Methodid); 
+		
+			
+				if(myfield.contains(FieldMethodsList, myfield)==false && FieldName!=null) {
+					st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`,  `classname`,  `classid`,  `methodname`, `methodid`) VALUES ('"+FieldName +"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
+					FieldMethodsList.add(myfield); 
+				}
+			
+			
+			
 			//ALTERNATIVE: 
 			//st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`,  `classname`,  `classid`,  `methodname`, `methodid`) VALUES ('"+fieldaccess.toString() +"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
 		}
