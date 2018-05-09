@@ -540,7 +540,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 					String FullConstructorName=constructor.getSignature().toString(); 
 					
 					String methodabbreviation=FullConstructorName.substring(0, FullConstructorName.indexOf("(")); 
-					 methodabbreviation=methodabbreviation.substring(0, methodabbreviation.lastIndexOf(".")+1)+"-init-"; 
+					 methodabbreviation=FullClassName+".-init-"; 
 
 					System.out.println("FULL CONSTRUCTOR NAME BEFORE METHOD ABBREVIATION:"+methodabbreviation);
 
