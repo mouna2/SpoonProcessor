@@ -1046,6 +1046,7 @@ try {
 		String classTOid=null; 
 		String ClassFROMName=null; 
 		 String ClassTOName=null; 
+		 String ParameterClassID=null; 
 		//get rid of everything that comes after the $ sign 
 		
 				
@@ -1168,17 +1169,32 @@ try {
 							callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
 					
 						}
+					
 						String par= transformstring(returnFROM); 
+					
 						 if(par.contains("de.java_chess")) {//ignore the basic data types, only insert the parameters thaht have classes as data types 
-						st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+par +"','" +par +"','"+classFROMid+"','"+classFROMid +"','"+ClassFROMName+"','" +callingmethodsrefinedid+"','" +MethodFROM+"','" +1+"')");
+							 
+							 ResultSet ParameterClassIDs= st.executeQuery("SELECT classes.id from classes where classes.classname='"+par+"'"); 
+								while(ParameterClassIDs.next()){
+									 ParameterClassID = ParameterClassIDs.getString("id"); 
+									   }
+							 
+							 
+						st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+par +"','" +par +"','"+ParameterClassID+"','"+classFROMid +"','"+ClassFROMName+"','" +callingmethodsrefinedid+"','" +MethodFROM+"','" +1+"')");
 						 }
 						String[] params = ExtractParams(MethodFROM); 
 						 //insert parameters that were retrieved from the log file 
 
 						for(String p: params) {
 							System.out.println("HERE IS A PARAM==================================================================>"+p); 
+							ResultSet ParameterClassIDs= st.executeQuery("SELECT classes.id from classes where classes.classname='"+p+"'"); 
+							while(ParameterClassIDs.next()){
+								 ParameterClassID = ParameterClassIDs.getString("id"); 
+								   }
+							
+							
 							if(p.contains("de.java_chess") && p!=null && p.equals("")==false && classFROMid!=null) {
-								st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+p +"','" +p +"','"+classFROMid+"','"+classFROMid +"','"+ClassFROMName+"','" +callingmethodsrefinedid+"','" +MethodFROM+"','" +0+"')");
+								st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+p +"','" +p +"','"+ParameterClassID+"','"+classFROMid +"','"+ClassFROMName+"','" +callingmethodsrefinedid+"','" +MethodFROM+"','" +0+"')");
 
 							}
 					}
@@ -1204,6 +1220,9 @@ try {
 						while(calledmethodsids.next()){
 							calledmethodid = calledmethodsids.getString("id"); 
 							   }
+						
+						
+						
 						//calculate class classname FROM 
 						ResultSet classnamesTO = st.executeQuery("SELECT classes.classname from classes where classes.classname ='"+ClassTO+"'"); 
 						
@@ -1212,9 +1231,12 @@ try {
 							   }
 						 par= transformstring(returnTO); 
 						 //insert return value within the parameters table 
-						 
+						  ResultSet ParameterClassIDs = st.executeQuery("SELECT classes.id from classes where classes.classname='"+par+"'"); 
+							while(ParameterClassIDs.next()){
+								 ParameterClassID = ParameterClassIDs.getString("id"); 
+								   }
 						 if(par.contains("de.java_chess")) {//ignore the basic data types, only insert the parameters thaht have classes as data types 
-								st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+par +"','" +par +"','"+classTOid+"','"+classTOid +"','"+ClassTOName+"','" +calledmethodid+"','" +MethodTO+"','" +1+"')");
+								st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+par +"','" +par +"','"+ParameterClassID+"','"+classTOid +"','"+ClassTOName+"','" +calledmethodid+"','" +MethodTO+"','" +1+"')");
 
 						 }
 						 
@@ -1222,8 +1244,13 @@ try {
 						 params = ExtractParams(MethodTO); 
 						for(String p: params) {
 							System.out.println("HERE IS A PARAM==================================================================>"+p); 
+							 ParameterClassIDs= st.executeQuery("SELECT classes.id from classes where classes.classname='"+p+"'"); 
+							while(ParameterClassIDs.next()){
+								 ParameterClassID = ParameterClassIDs.getString("id"); 
+								   }
+							
 							if(p.contains("de.java_chess")&& p!=null && p.equals("")==false && classTOid!=null) {
-								st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+p +"','" +p +"','"+classTOid+"','"+classTOid +"','"+ClassTOName+"','" +calledmethodid+"','" +MethodTO+"','" +0+"')");
+								st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+p +"','" +p +"','"+ParameterClassID+"','"+classTOid +"','"+ClassTOName+"','" +calledmethodid+"','" +MethodTO+"','" +0+"')");
 
 							}
 						}
