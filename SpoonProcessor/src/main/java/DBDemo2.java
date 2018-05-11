@@ -948,13 +948,13 @@ for(CtType<?> clazz : classFactory.getAll()) {
 	   		   }
 			
 			
-			System.out.println("CALLED METHOD "+calledmethodname+ "\tCLASS2: "+calledmethodclass+"\tCALLINGMETHOD: "+callingmethodsrefinedname+"CALLING MENTHOD CLASS"+callingmethodclass);
+			//System.out.println("CALLED METHOD "+calledmethodname+ "\tCLASS2: "+calledmethodclass+"\tCALLINGMETHOD: "+callingmethodsrefinedname+"CALLING MENTHOD CLASS"+callingmethodclass);
 
 		    
 			
 			
 			methodcalls methodcall= new methodcalls(calledmethodid, calledmethodname, calledmethodclass, callingmethodsrefinedid, callingmethodsrefinedname, callingmethodclass); 
-		
+			
 			
 			if(methodcall.contains(methodcallsList, methodcall)==false && callingmethodsrefinedname!=null && callingmethodsrefinedid!=null && callingmethodclass!=null && calledmethodclass!=null && calledmethodname!=null && calledmethodid!=null) {
 				String statement = "INSERT INTO `methodcalls`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+calledmethodid +"','" +calledmethodname+"','" +calledmethodclass+"','" +callingmethodsrefinedid+"','" +callingmethodsrefinedname+"','" +callingmethodclass+"')";
@@ -990,6 +990,9 @@ BufferedReader bufferedReader = new BufferedReader(fileReader);
 StringBuffer stringBuffer = new StringBuffer();
 String line;
 try {
+	
+	List<methodcallsexecuted> methodcallsexecutedlist= new ArrayList<methodcallsexecuted>(); 
+
 	while ((line = bufferedReader.readLine()) != null) {
 		String methodsCalling= line.substring(1, line.indexOf("---")); 	
 		String ClassFROM=methodsCalling.substring(0, methodsCalling.lastIndexOf("."));
@@ -1036,10 +1039,29 @@ try {
 		String calledmethodid=null; 
 		String calledmethodname=null; 
 		String calledmethodclass=null; 
+		//get rid of everything that comes after the $ sign 
 		
+				
+				
 		String MethodFROMTransformed= MethodFROM.substring(0, MethodFROM.indexOf("(")); 
 		String MethodTOTransformed= MethodTO.substring(0, MethodTO.indexOf("(")); 
 		//CALLING METHOD ID 
+		
+		if(ClassFROM.contains("$")) {
+			ClassFROM=ClassFROM.substring(0, ClassFROM.indexOf("$")); 
+
+		}
+		if(ClassTO.contains("$")) {
+			ClassTO=ClassTO.substring(0, ClassTO.indexOf("$")); 
+		}
+		if(MethodTO.equals("-clinit-()")) {
+			MethodTO="-init()"; 
+		}
+		if(MethodFROM.equals("-clinit-()")) {
+			MethodFROM="-init()"; 
+		}
+		
+		
 		ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodFROMTransformed+"' and classes.classname='"+ClassFROM+"'"); 
 		while(callingmethodsrefined.next()){
 			callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
@@ -1080,13 +1102,24 @@ try {
 		
 		
 	
-		System.out.println("CLASS FROM: "+ClassFROM+"        METHOD FROM       "+ MethodFROM+ "       CLASS TO       "+ ClassTO+"       Method To       "+MethodTO+"calling merthod refined id    "+ callingmethodsrefinedid+ "called method id    "+ calledmethodid); 
-	
-	//	if(callingmethodsrefinedid!=null && callingmethodclass!=null && calledmethodclass!=null && calledmethodname!=null && calledmethodid!=null) {
-			String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTO+"','" +ClassTO +"')";
-			
+		
+		
+		//System.out.println("CLASS FROM: "+ClassFROM+"        METHOD FROM       "+ MethodFROM+ "       CLASS TO       "+ ClassTO+"       Method To       "+MethodTO+"calling merthod refined id    "+ callingmethodsrefinedid+ "called method id    "+ calledmethodid); 
+
+		methodcallsexecuted mce= new methodcallsexecuted(callingmethodsrefinedid, MethodFROM, ClassFROM, calledmethodid, MethodTO, ClassTO); 
+		System.out.println(mce.toString()); 	
+		if(mce.contains(methodcallsexecutedlist, mce)==false) {
+			String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTO+"','" +ClassTO +"')";		
 			st.executeUpdate(statement);
-	//	}
+			methodcallsexecutedlist.add(mce); 
+		}
+			
+		
+		
+		
+		
+		
+		
 		
 	}
 } catch (IOException e) {
