@@ -1039,6 +1039,8 @@ try {
 		String calledmethodid=null; 
 		String calledmethodname=null; 
 		String calledmethodclass=null; 
+		String classFROMid=null; 
+		String classTOid=null; 
 		//get rid of everything that comes after the $ sign 
 		
 				
@@ -1054,18 +1056,19 @@ try {
 		if(ClassTO.contains("$")) {
 			ClassTO=ClassTO.substring(0, ClassTO.indexOf("$")); 
 		}
-		if(MethodTO.equals("-clinit-()")) {
-			MethodTO="-init()"; 
+		if(MethodTOTransformed.equals("-clinit-()")) {
+			MethodTOTransformed="-init()"; 
 		}
-		if(MethodFROM.equals("-clinit-()")) {
-			MethodFROM="-init()"; 
+		if(MethodFROMTransformed.equals("-clinit-()")) {
+			MethodFROMTransformed="-init()"; 
 		}
 		
-		
+		//CALLING METHOD ID 
 		ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodFROMTransformed+"' and classes.classname='"+ClassFROM+"'"); 
 		while(callingmethodsrefined.next()){
 			callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
-			   }
+	
+		}
 		 
 		//CALLING METHOD NAME 
 		ResultSet callingmethodsrefinednames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodFROM+"'"); 
@@ -1101,17 +1104,94 @@ try {
 			   }
 		
 		
-	
 		
+		
+
+		
+		
+		
+		
+				
+				
+				
+				
 		
 		//System.out.println("CLASS FROM: "+ClassFROM+"        METHOD FROM       "+ MethodFROM+ "       CLASS TO       "+ ClassTO+"       Method To       "+MethodTO+"calling merthod refined id    "+ callingmethodsrefinedid+ "called method id    "+ calledmethodid); 
 
 		methodcallsexecuted mce= new methodcallsexecuted(callingmethodsrefinedid, MethodFROM, ClassFROM, calledmethodid, MethodTO, ClassTO); 
 		System.out.println(mce.toString()); 	
 		if(mce.contains(methodcallsexecutedlist, mce)==false) {
-			String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTO+"','" +ClassTO +"')";		
-			st.executeUpdate(statement);
-			methodcallsexecutedlist.add(mce); 
+			if(callingmethodsrefinedid!=null && calledmethodid!=null ) {
+				String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTO+"','" +ClassTO +"')";		
+				st.executeUpdate(statement);
+				methodcallsexecutedlist.add(mce); 
+			}
+			else {
+				//if the methods table does not contain a method call that is obtained from parsing the log file, then I am inserting this row within the methods table
+				   //This is for METHOD FROM 
+					
+				
+				//calculate class id FROM 
+					ResultSet classidsFROM = st.executeQuery("SELECT classes.id from classes where classes.classname ='"+ClassFROM+"'"); 
+					while(classidsFROM.next()){
+						classFROMid = classidsFROM.getString("id"); 
+						   }
+					
+					String MethodFROMRefined= MethodFROM.substring(0, MethodFROM.indexOf("(")); 
+					String MethodFROMAbbreviation = ClassFROM+"."+MethodFROMRefined; 
+					if(callingmethodsrefinedid==null) {
+						st.executeUpdate("INSERT INTO `methods`(`methodname`,  `methodnamerefined`,`methodabbreviation`, `classid`, `classname`) VALUES ('"+MethodFROM +"','" +MethodFROMRefined+"','" +MethodFROMAbbreviation+"','" +classFROMid+"','" +ClassFROM+"')");
+
+					}
+				
+					
+					
+					
+					//METHOD TO 
+					//calculate class id TO 
+					ResultSet classidsTO = st.executeQuery("SELECT classes.id from classes where classes.classname ='"+ClassTO+"'"); 
+					while(classidsTO.next()){
+						classTOid = classidsTO.getString("id"); 
+						   }
+					
+					String MethodTORefined= MethodTO.substring(0, MethodTO.indexOf("(")); 
+					String MethodTOAbbreviation = ClassTO+"."+MethodTORefined; 
+					if(calledmethodid==null) {
+						st.executeUpdate("INSERT INTO `methods`(`methodname`,  `methodnamerefined`,`methodabbreviation`, `classid`, `classname`) VALUES ('"+MethodTO +"','" +MethodTORefined+"','" +MethodTOAbbreviation+"','" +classTOid+"','" +ClassTO+"')");
+
+					}
+				
+					
+					
+					
+					
+					//RECALCULATION PHASE: CALLING METHOD ID 
+					 callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodFROMTransformed+"' and classes.classname='"+ClassFROM+"'"); 
+					while(callingmethodsrefined.next()){
+						callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
+				
+					}
+
+					//RECALCULATION PHASE: CALLED METHOD ID 
+					 calledmethodsids= st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodTOTransformed+"'and classes.classname='"+ClassTO+"'"); 
+					while(calledmethodsids.next()){
+						calledmethodid = calledmethodsids.getString("id"); 
+						   }
+					
+					//insert into methodcallsexecuted table 
+					String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTO+"','" +ClassTO +"')";		
+					st.executeUpdate(statement);
+					methodcallsexecutedlist.add(mce); 	
+					
+					
+				//insert into methodcalls table as well 
+					String statement2 = "INSERT INTO `methodcalls`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTO+"','" +ClassTO +"')";		
+					st.executeUpdate(statement2);
+				
+					
+					
+					
+			}
 		}
 			
 		
