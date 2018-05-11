@@ -908,6 +908,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 			String calledmethodid=null; 
 			String calledmethodname=null; 
 			String calledmethodclass=null; 
+			String paramclassid=null; 
 			//CALLING METHOD ID 
 			ResultSet callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+calledmethod.getExecutable().getSignature().toString()+"' and classes.classname='"+  clazz.getQualifiedName() +"'"); 
 			while(callingmethodsrefined.next()){
@@ -997,6 +998,7 @@ try {
 		String methodsCalling= line.substring(1, line.indexOf("---")); 	
 		String ClassFROM=methodsCalling.substring(0, methodsCalling.lastIndexOf("."));
 		String MethodFROM=methodsCalling.substring(methodsCalling.lastIndexOf(".")+1, methodsCalling.indexOf(")")+1);
+		String returnFROM= methodsCalling.substring(methodsCalling.lastIndexOf(")")+1, methodsCalling.length());
 		MethodFROM=MethodFROM.replace("/", "."); 
 		MethodFROM=MethodFROM.replace(";", ","); 
 		  int endIndex = MethodFROM.lastIndexOf(",");
@@ -1010,6 +1012,7 @@ try {
 		String methodsCalled=line.substring(line.lastIndexOf("---")+5, line.length()-1); 			
 		String ClassTO=methodsCalled.substring(0, methodsCalled.lastIndexOf("."));
 		String MethodTO=methodsCalled.substring(methodsCalled.lastIndexOf(".")+1, methodsCalled.indexOf(")")+1); 
+		String returnTO= methodsCalled.substring(methodsCalled.lastIndexOf(")")+1, methodsCalled.length());
 		MethodTO=MethodTO.replace("/", "."); 
 		MethodTO=MethodTO.replace(";", ","); 
 		
@@ -1041,6 +1044,8 @@ try {
 		String calledmethodclass=null; 
 		String classFROMid=null; 
 		String classTOid=null; 
+		String ClassFROMName=null; 
+		 String ClassTOName=null; 
 		//get rid of everything that comes after the $ sign 
 		
 				
@@ -1056,11 +1061,11 @@ try {
 		if(ClassTO.contains("$")) {
 			ClassTO=ClassTO.substring(0, ClassTO.indexOf("$")); 
 		}
-		if(MethodTOTransformed.equals("-clinit-()")) {
-			MethodTOTransformed="-init()"; 
+		if(MethodTOTransformed.equals("-clinit-")) {
+			MethodTOTransformed="-init-"; 
 		}
-		if(MethodFROMTransformed.equals("-clinit-()")) {
-			MethodFROMTransformed="-init()"; 
+		if(MethodFROMTransformed.equals("-clinit-")) {
+			MethodFROMTransformed="-init-"; 
 		}
 		
 		//CALLING METHOD ID 
@@ -1071,7 +1076,7 @@ try {
 		}
 		 
 		//CALLING METHOD NAME 
-		ResultSet callingmethodsrefinednames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodFROM+"'"); 
+		ResultSet callingmethodsrefinednames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodFROMTransformed+"'"); 
 		while(callingmethodsrefinednames.next()){
 			callingmethodsrefinedname = callingmethodsrefinednames.getString("methodname"); 
 			   }
@@ -1091,7 +1096,7 @@ try {
 			   }
 		 
 		//CALLED METHOD NAME 
-		ResultSet callemethodnames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodTO+"'"); 
+		ResultSet callemethodnames = st.executeQuery("SELECT methods.methodname from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodname='"+MethodTOTransformed+"'"); 
 		while(callemethodnames.next()){
 			calledmethodname = callemethodnames.getString("methodname"); 
 			   }
@@ -1118,11 +1123,11 @@ try {
 		
 		//System.out.println("CLASS FROM: "+ClassFROM+"        METHOD FROM       "+ MethodFROM+ "       CLASS TO       "+ ClassTO+"       Method To       "+MethodTO+"calling merthod refined id    "+ callingmethodsrefinedid+ "called method id    "+ calledmethodid); 
 
-		methodcallsexecuted mce= new methodcallsexecuted(callingmethodsrefinedid, MethodFROM, ClassFROM, calledmethodid, MethodTO, ClassTO); 
+		methodcallsexecuted mce= new methodcallsexecuted(callingmethodsrefinedid, MethodFROMTransformed, ClassFROM, calledmethodid, MethodTOTransformed, ClassTO); 
 		System.out.println(mce.toString()); 	
 		if(mce.contains(methodcallsexecutedlist, mce)==false) {
 			if(callingmethodsrefinedid!=null && calledmethodid!=null ) {
-				String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTO+"','" +ClassTO +"')";		
+				String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROMTransformed+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTOTransformed+"','" +ClassTO +"')";		
 				st.executeUpdate(statement);
 				methodcallsexecutedlist.add(mce); 
 			}
@@ -1137,11 +1142,45 @@ try {
 						classFROMid = classidsFROM.getString("id"); 
 						   }
 					
-					String MethodFROMRefined= MethodFROM.substring(0, MethodFROM.indexOf("(")); 
-					String MethodFROMAbbreviation = ClassFROM+"."+MethodFROMRefined; 
+					//calculate class classname FROM 
+					ResultSet classnamesFROM = st.executeQuery("SELECT classes.classname from classes where classes.classname ='"+ClassFROM+"'"); 
+					while(classnamesFROM.next()){
+						ClassFROMName = classnamesFROM.getString("classname"); 
+						   }
+					
+					
+					//calculate class classname FROM 
+					ResultSet paramclassids = st.executeQuery("SELECT classes.id from classes where classes.id ='"+returnFROM+"'"); 
+					while(paramclassids.next()){
+						classFROMid = paramclassids.getString("id"); 
+						   }
+					
+					
+				//	String MethodFROMRefined= MethodFROMTransformed.substring(0, MethodFROMTransformed.indexOf("(")); 
+					String MethodFROMRefined= MethodFROMTransformed; 
+					String MethodFROMAbbreviation = ClassFROM+"."+MethodFROMTransformed; 
 					if(callingmethodsrefinedid==null) {
 						st.executeUpdate("INSERT INTO `methods`(`methodname`,  `methodnamerefined`,`methodabbreviation`, `classid`, `classname`) VALUES ('"+MethodFROM +"','" +MethodFROMRefined+"','" +MethodFROMAbbreviation+"','" +classFROMid+"','" +ClassFROM+"')");
+		    		
+						//RECALCULATION PHASE: CALLING METHOD ID 
+						 callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodFROMTransformed+"' and classes.classname='"+ClassFROM+"'"); 
+						while(callingmethodsrefined.next()){
+							callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
+					
+						}
+						String par= transformstring(returnFROM); 
+						 if(par.contains("de.java_chess")) {//ignore the basic data types, only insert the parameters thaht have classes as data types 
+						st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+par +"','" +par +"','"+classFROMid+"','"+classFROMid +"','"+ClassFROMName+"','" +callingmethodsrefinedid+"','" +MethodFROM+"','" +1+"')");
+						 }
+						String[] params = ExtractParams(MethodFROM); 
+						 //insert parameters that were retrieved from the log file 
 
+						for(String p: params) {
+							System.out.println("HERE IS A PARAM==================================================================>"+p); 
+							if(p.contains("de.java_chess") && p!=null && p.equals("")==false && classFROMid!=null) {
+								st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+p +"','" +p +"','"+classFROMid+"','"+classFROMid +"','"+ClassFROMName+"','" +callingmethodsrefinedid+"','" +MethodFROM+"','" +0+"')");
+
+							}
 					}
 				
 					
@@ -1154,17 +1193,47 @@ try {
 						classTOid = classidsTO.getString("id"); 
 						   }
 					
-					String MethodTORefined= MethodTO.substring(0, MethodTO.indexOf("(")); 
+					//String MethodTORefined= MethodTOTransformed.substring(0, MethodTOTransformed.indexOf("(")); 
+					String MethodTORefined= MethodTOTransformed;
 					String MethodTOAbbreviation = ClassTO+"."+MethodTORefined; 
 					if(calledmethodid==null) {
 						st.executeUpdate("INSERT INTO `methods`(`methodname`,  `methodnamerefined`,`methodabbreviation`, `classid`, `classname`) VALUES ('"+MethodTO +"','" +MethodTORefined+"','" +MethodTOAbbreviation+"','" +classTOid+"','" +ClassTO+"')");
 
+						//RECALCULATION PHASE: CALLED METHOD ID 
+						 calledmethodsids= st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodTOTransformed+"'and classes.classname='"+ClassTO+"'"); 
+						while(calledmethodsids.next()){
+							calledmethodid = calledmethodsids.getString("id"); 
+							   }
+						//calculate class classname FROM 
+						ResultSet classnamesTO = st.executeQuery("SELECT classes.classname from classes where classes.classname ='"+ClassTO+"'"); 
+						
+						while(classnamesTO.next()){
+							ClassTOName = classnamesTO.getString("classname"); 
+							   }
+						 par= transformstring(returnTO); 
+						 //insert return value within the parameters table 
+						 
+						 if(par.contains("de.java_chess")) {//ignore the basic data types, only insert the parameters thaht have classes as data types 
+								st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+par +"','" +par +"','"+classTOid+"','"+classTOid +"','"+ClassTOName+"','" +calledmethodid+"','" +MethodTO+"','" +1+"')");
+
+						 }
+						 
+						 //insert parameters that were retrieved from the log file 
+						 params = ExtractParams(MethodTO); 
+						for(String p: params) {
+							System.out.println("HERE IS A PARAM==================================================================>"+p); 
+							if(p.contains("de.java_chess")&& p!=null && p.equals("")==false && classTOid!=null) {
+								st.executeUpdate("INSERT INTO `parameters`(`parametername`, `parametertype`, `parameterclass`,`classid`, `classname`, `methodid`, `methodname`, `isreturn`) VALUES ('"+p +"','" +p +"','"+classTOid+"','"+classTOid +"','"+ClassTOName+"','" +calledmethodid+"','" +MethodTO+"','" +0+"')");
+
+							}
+						}
+					
 					}
 				
 					
 					
 					
-					
+					/*
 					//RECALCULATION PHASE: CALLING METHOD ID 
 					 callingmethodsrefined = st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodFROMTransformed+"' and classes.classname='"+ClassFROM+"'"); 
 					while(callingmethodsrefined.next()){
@@ -1176,16 +1245,16 @@ try {
 					 calledmethodsids= st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodTOTransformed+"'and classes.classname='"+ClassTO+"'"); 
 					while(calledmethodsids.next()){
 						calledmethodid = calledmethodsids.getString("id"); 
-						   }
+						   }*/
 					
 					//insert into methodcallsexecuted table 
-					String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTO+"','" +ClassTO +"')";		
+					String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROMTransformed+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTOTransformed+"','" +ClassTO +"')";		
 					st.executeUpdate(statement);
 					methodcallsexecutedlist.add(mce); 	
 					
 					
 				//insert into methodcalls table as well 
-					String statement2 = "INSERT INTO `methodcalls`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTO+"','" +ClassTO +"')";		
+					String statement2 = "INSERT INTO `methodcalls`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROMTransformed+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTOTransformed+"','" +ClassTO +"')";		
 					st.executeUpdate(statement2);
 				
 					
@@ -1199,7 +1268,7 @@ try {
 		
 		
 		
-		
+		}	
 		
 	}
 } catch (IOException e) {
@@ -1215,5 +1284,26 @@ try {
 //System.out.println(stringBuffer.toString());
 
 
+	}
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	public String transformstring(String s) {
+		s=s.replace("/", "."); 
+		s=s.replace(";", ","); 
+		  int endIndex = s.lastIndexOf(",");
+		    if (endIndex != -1)  
+		    {
+		    	s = s.substring(0, endIndex); // not forgot to put check if(endIndex != -1)
+		    }
+		s=s.replace("Lde", "de"); 
+		s=s.replace("Ljava", "java"); 
+		return s; 
+	}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	
+	public String[] ExtractParams(String method) {
+		String Paramlist=method.substring(method.indexOf("(")+1, method.indexOf(")")); 
+		 String[] data = Paramlist.split(",");
+		 return data; 
 	}
 }
