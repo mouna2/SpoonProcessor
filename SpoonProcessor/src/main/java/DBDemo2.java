@@ -328,7 +328,22 @@ public class DBDemo2 {
 			   		"  `calleeclass` LONGTEXT NULL,\r\n" + 
 			   		"  PRIMARY KEY (`id`),\r\n" + 
 			   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC)); " ); 
-		   
+		   st.executeUpdate("CREATE TABLE `databasechess`.`traces` (\r\n" + 
+		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
+		   		"  `requirement` LONGTEXT NULL,\r\n" + 
+		   		"  `method` LONGTEXT NULL,\r\n" + 
+		   		"  `fullmethod` LONGTEXT NULL,\r\n" +
+		   		"  `methodid` INT NULL,\r\n" + 
+		   		"  `gold` LONGTEXT NULL,\r\n" + 
+		   		"  `subject` LONGTEXT NULL,\r\n" + 
+		   		"  PRIMARY KEY (`id`),\r\n" + 
+		   		"  INDEX `methodid_idx8` (`methodid` ASC),\r\n" + 
+		   		"  CONSTRAINT `methodid8`\r\n" + 
+		   		"    FOREIGN KEY (`methodid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION);\r\n" + 
+		   		""); 
 		 
 		   
 		   try {
@@ -379,6 +394,11 @@ public class DBDemo2 {
         /*********************************************************************************************************************************************************************************/	
         /*********************************************************************************************************************************************************************************/	
         /*********************************************************************************************************************************************************************************/	  	
+    
+    	
+    	
+    	
+    	
     	//BUILD CLASSES TABLE 
     	for(CtType<?> clazz : classFactory.getAll()) {
     		
@@ -1311,11 +1331,60 @@ try {
 
 //System.out.println("Contents of file:");
 //System.out.println(stringBuffer.toString());
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/   
+//CREATE TRACES TABLE 
+
+ file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Traces.txt");
+ fileReader = new FileReader(file);
+ bufferedReader = new BufferedReader(fileReader);
+ stringBuffer = new StringBuffer();
+ String requirement=null; 
+ String method=null; 
+ String gold=null; 
+ String subject=null; 
+ String methodid=null; 
+ 
+try {
+	
+	line = bufferedReader.readLine(); 
+	while ((line = bufferedReader.readLine()) != null) {
+		System.out.println(line);
+		String[] linesplitted = line.split(","); 
+		method=linesplitted[1]; 
+		requirement=linesplitted[2]; 
+		gold=linesplitted[4]; 
+		subject=linesplitted[5]; 
+		
+		String shortmethod=method.substring(0, method.indexOf("(")); 
+		ResultSet methodids = st.executeQuery("SELECT methods.id from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+		while(methodids.next()){
+			methodid = methodids.getString("id"); 
+			   }
+		
+		String statement = "INSERT INTO `traces`(`requirement`,  `method`, `fullmethod`, `methodid`,`gold`,  `subject`) VALUES ('"+requirement+"','" +shortmethod+"','" +method+"','" +methodid+"','"+gold +"','" +subject+"')";		
+		st.executeUpdate(statement);
+	
+		
+		
+	}
+
+
 
 
 	}
 	
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+catch (IOException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+	
+}
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	public String transformstring(String s) {
 		s=s.replace("/", "."); 
 		s=s.replace(";", ","); 
