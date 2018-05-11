@@ -298,34 +298,34 @@ public class DBDemo2 {
 
 		   st.executeUpdate("CREATE TABLE `databasechess`.`methodcalls` (\r\n" + 
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
-		   		"  `methodcalledid` INT NULL,\r\n" + 
-		   		"  `methodcalledname` LONGTEXT NULL,\r\n" + 
-		   		"  `methodcalledclass` LONGTEXT NULL,\r\n" + 
-		   		"  `callingmethodid` INT NULL,\r\n" + 
-		   		"  `callingmethodname` LONGTEXT NULL,\r\n" + 
-		   		"  `callingmethodclass` LONGTEXT NULL,\r\n" + 
+		   		"  `callerid` INT NULL,\r\n" + 
+		   		"  `callername` LONGTEXT NULL,\r\n" + 
+		   		"  `callerclass` LONGTEXT NULL,\r\n" + 
+		   		"  `calleeid` INT NULL,\r\n" + 
+		   		"  `calleename` LONGTEXT NULL,\r\n" + 
+		   		"  `calleeclass` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
-		   		"  INDEX `methodcalledid_idx` (`methodcalledid` ASC),\r\n" + 
-		   		"  INDEX `callingmethodid_idx` (`callingmethodid` ASC),\r\n" + 
+		   		"  INDEX `caller_idx` (`callerid` ASC),\r\n" + 
+		   		"  INDEX `callee_idx` (`calleeid` ASC),\r\n" + 
 		   		"  CONSTRAINT `methodcalledid`\r\n" + 
-		   		"    FOREIGN KEY (`methodcalledid`)\r\n" + 
+		   		"    FOREIGN KEY (`callerid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION,\r\n" + 
 		   		"  CONSTRAINT `callingmethodid`\r\n" + 
-		   		"    FOREIGN KEY (`callingmethodid`)\r\n" + 
+		   		"    FOREIGN KEY (`calleeid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
 		   st.executeUpdate("CREATE TABLE `databasechess`.`methodcallsexecuted` (\r\n" + 
 			   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
-			   		"  `methodcalledid` LONGTEXT NULL,\r\n" + 
-			   		"  `methodcalledname` LONGTEXT NULL,\r\n" + 
-			   		"  `methodcalledclass` LONGTEXT NULL,\r\n" + 
-			   		"  `callingmethodid` LONGTEXT NULL,\r\n" + 
-			   		"  `callingmethodname` LONGTEXT NULL,\r\n" + 
-			   		"  `callingmethodclass` LONGTEXT NULL,\r\n" + 
+			   		"  `callerid` LONGTEXT NULL,\r\n" + 
+			   		"  `callername` LONGTEXT NULL,\r\n" + 
+			   		"  `callerclass` LONGTEXT NULL,\r\n" + 
+			   		"  `calleeid` LONGTEXT NULL,\r\n" + 
+			   		"  `calleename` LONGTEXT NULL,\r\n" + 
+			   		"  `calleeclass` LONGTEXT NULL,\r\n" + 
 			   		"  PRIMARY KEY (`id`),\r\n" + 
 			   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC)); " ); 
 		   
@@ -546,7 +546,8 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 
 					//st.executeUpdate("INSERT INTO `fields`(`fieldname`) VALUES ('"+field+"');");
 					//24 is the size of the string "de.java_chess.javaChess."
-						FullConstructorName=FullConstructorName.substring(24, FullConstructorName.length()); 
+					int packagesize= "de.java_chess.javaChess.".length(); 
+						FullConstructorName=FullConstructorName.substring(packagesize, FullConstructorName.length()); 
 						FullConstructorName="-init-"+FullConstructorName.substring(FullConstructorName.lastIndexOf('('));  
 						
 							System.out.println("FULL CONSTRUCTOR NAME AFTER:"+FullConstructorName);
@@ -956,7 +957,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 		
 			
 			if(methodcall.contains(methodcallsList, methodcall)==false && callingmethodsrefinedname!=null && callingmethodsrefinedid!=null && callingmethodclass!=null && calledmethodclass!=null && calledmethodname!=null && calledmethodid!=null) {
-				String statement = "INSERT INTO `methodcalls`(`methodcalledid`,  `methodcalledname`,  `methodcalledclass`,`callingmethodid`,  `callingmethodname`, `callingmethodclass`) VALUES ('"+calledmethodid +"','" +calledmethodname+"','" +calledmethodclass+"','" +callingmethodsrefinedid+"','" +callingmethodsrefinedname+"','" +callingmethodclass+"')";
+				String statement = "INSERT INTO `methodcalls`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+calledmethodid +"','" +calledmethodname+"','" +calledmethodclass+"','" +callingmethodsrefinedid+"','" +callingmethodsrefinedname+"','" +callingmethodclass+"')";
 				
 				st.executeUpdate(statement);
 				methodcallsList.add(methodcall); 
@@ -1082,7 +1083,7 @@ try {
 		System.out.println("CLASS FROM: "+ClassFROM+"        METHOD FROM       "+ MethodFROM+ "       CLASS TO       "+ ClassTO+"       Method To       "+MethodTO+"calling merthod refined id    "+ callingmethodsrefinedid+ "called method id    "+ calledmethodid); 
 	
 	//	if(callingmethodsrefinedid!=null && callingmethodclass!=null && calledmethodclass!=null && calledmethodname!=null && calledmethodid!=null) {
-			String statement = "INSERT INTO `methodcallsexecuted`(`methodcalledid`,  `methodcalledname`,  `methodcalledclass`,`callingmethodid`,  `callingmethodname`, `callingmethodclass`) VALUES ('"+calledmethodid +"','" +MethodTO+"','" +ClassTO+"','" +callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"')";
+			String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROM+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTO+"','" +ClassTO +"')";
 			
 			st.executeUpdate(statement);
 	//	}
