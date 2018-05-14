@@ -334,6 +334,8 @@ public class DBDemo2 {
 		   		"  `method` LONGTEXT NULL,\r\n" + 
 		   		"  `fullmethod` LONGTEXT NULL,\r\n" +
 		   		"  `methodid` INT NULL,\r\n" + 
+		   		"  `classname` LONGTEXT NULL,\r\n" + 
+		   		"  `classid` LONGTEXT NULL,\r\n" + 
 		   		"  `gold` LONGTEXT NULL,\r\n" + 
 		   		"  `subject` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
@@ -345,6 +347,13 @@ public class DBDemo2 {
 		   		"    ON UPDATE NO ACTION);\r\n" + 
 		   		""); 
 		 
+		   
+		   st.executeUpdate("CREATE TABLE `databasechess`.`requirements` (\r\n" + 
+		   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
+		   		"  `requirementname` LONGTEXT NULL,\r\n" + 
+		   		"  PRIMARY KEY (`id`),\r\n" + 
+		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC));"); 
+			 
 		   
 		   try {
 			Spoon();
@@ -1345,7 +1354,8 @@ try {
  String gold=null; 
  String subject=null; 
  String methodid=null; 
- 
+ String classname=null; 
+ String classid=null; 
 try {
 	
 	line = bufferedReader.readLine(); 
@@ -1363,7 +1373,17 @@ try {
 			methodid = methodids.getString("id"); 
 			   }
 		
-		String statement = "INSERT INTO `traces`(`requirement`,  `method`, `fullmethod`, `methodid`,`gold`,  `subject`) VALUES ('"+requirement+"','" +shortmethod+"','" +method+"','" +methodid+"','"+gold +"','" +subject+"')";		
+		ResultSet classnames = st.executeQuery("SELECT methods.classname from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+		while(classnames.next()){
+			classname = classnames.getString("classname"); 
+			   }
+		
+		ResultSet classids = st.executeQuery("SELECT methods.classid from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+		while(classids.next()){
+			classid = classids.getString("classid"); 
+			   }
+		
+		String statement = "INSERT INTO `traces`(`requirement`,  `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"')";		
 		st.executeUpdate(statement);
 	
 		
@@ -1380,7 +1400,43 @@ catch (IOException e) {
 	e.printStackTrace();
 }
 
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/   
+//CREATE TRACES TABLE 
+
+ file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Requirements.txt");
+ fileReader = new FileReader(file);
+ bufferedReader = new BufferedReader(fileReader);
+ stringBuffer = new StringBuffer();
+
+ 
+try {
 	
+
+	while ((line = bufferedReader.readLine()) != null) {
+		System.out.println(line);
+		
+		
+		
+	
+		
+		String statement = "INSERT INTO `requirements`(`requirementname`) VALUES ('"+line+"')";		
+		st.executeUpdate(statement);
+	
+		
+		
+	}
+
+
+
+
+	}
+	
+catch (IOException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}	
 }
 	
 	
