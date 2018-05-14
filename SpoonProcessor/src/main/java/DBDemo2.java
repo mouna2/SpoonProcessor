@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -1409,7 +1410,6 @@ catch (IOException e) {
  String requirementid=null; 
 
  List<tracesmethods> TraceListMethods= new ArrayList<tracesmethods>();
- List<tracesclasses> TraceListClasses= new ArrayList<tracesclasses>(); 
 
 try {
 	
@@ -1479,11 +1479,15 @@ catch (IOException e) {
 	/*********************************************************************************************************************************************************************************/	
 	/*********************************************************************************************************************************************************************************/	
 	/*********************************************************************************************************************************************************************************/   
-	try {
+List<RequirementClassKey> RequirementClassKeys= new ArrayList<RequirementClassKey>(); 
+	
+try {
 		file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Traces.txt");
 		fileReader = new FileReader(file);
 		bufferedReader = new BufferedReader(fileReader);	
 		line = bufferedReader.readLine(); 
+		Hashtable<RequirementClassKey,String> GoldHashTable=new Hashtable<RequirementClassKey,String>();  
+		Hashtable<RequirementClassKey,String> SubjectHashTable=new Hashtable<RequirementClassKey,String>();  
 		while ((line = bufferedReader.readLine()) != null) {
 			System.out.println(line);
 			String[] linesplitted = line.split(","); 
@@ -1528,14 +1532,38 @@ catch (IOException e) {
 		while(subjectvalues.next()){
 			subjectvalue = subjectvalues.getString("subject"); 
 			   }
+		
+		//GoldSubjectValues goldsubject= new GoldSubjectValues(goldvalue, subjectvalue); 
+		RequirementClassKey RequirementClassKey= new RequirementClassKey(requirementid, requirement, classid, classname, goldvalue, subjectvalue); 
+		if(GoldHashTable.containsKey(RequirementClassKey)==false) {
+			GoldHashTable.put(RequirementClassKey, goldvalue); 
+		}
+		else if((GoldHashTable.get(RequirementClassKey).equals("T")==false) &&( RequirementClassKey.getGoldflag().equals("T")==false)  ) {
+			GoldHashTable.put(RequirementClassKey, goldvalue); 
+		}
 	
+		else {
+			GoldHashTable.put(RequirementClassKey, goldvalue); 
+			RequirementClassKey.setGoldflag(goldvalue); 
+		}
+		if(SubjectHashTable.containsKey(RequirementClassKey)==false) {
+			SubjectHashTable.put(RequirementClassKey, subjectvalue); 
+		}
+		
+		else if((SubjectHashTable.get(RequirementClassKey).equals("T")==false) && (RequirementClassKey.getSubjectflag().equals("T")==false) ) {
+			SubjectHashTable.put(RequirementClassKey, subjectvalue); 
+		}
+		else {
+			SubjectHashTable.put(RequirementClassKey, subjectvalue); 
+			RequirementClassKey.setSubjectflag(subjectvalue); 
+		}
+		
 	 
-	 
-	 tracesclasses tc= new tracesclasses(requirement, requirementid,  classname, classid, goldvalue, subjectvalue); 
-		if(tc.contains(TraceListClasses, tc)==false) {
-			String statement2= "INSERT INTO `tracesclasses`(`requirement`, `requirementid`,  `classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','"  +classname+"','" +classid+"','"+goldvalue +"','" +subjectvalue+"')";	
+	
+		if(RequirementClassKey.contains(RequirementClassKeys, RequirementClassKey)==false) {
+			String statement2= "INSERT INTO `tracesclasses`(`requirement`, `requirementid`,  `classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','"  +classname+"','" +classid+"','"+GoldHashTable.get(RequirementClassKey) +"','" +SubjectHashTable.get(RequirementClassKey)+"')";	
 			st.executeUpdate(statement2); 
-			TraceListClasses.add(tc); 
+			RequirementClassKeys.add(RequirementClassKey); 
 		}
 	
 	
