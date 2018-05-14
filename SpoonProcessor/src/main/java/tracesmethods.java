@@ -1,6 +1,6 @@
 import java.util.List;
 
-public class traces {
+public class tracesmethods {
 	public String requirement; 
 	public String requirementid; 
 	public String fullmethod; 
@@ -16,7 +16,7 @@ public class traces {
 	
 	
 
-	public traces(String requirement, String requirementid, String fullmethod, String methodid, String classname,
+	public tracesmethods(String requirement, String requirementid, String fullmethod, String methodid, String classname,
 			String classid, String gold, String subject) {
 		
 		this.requirement = requirement;
@@ -29,7 +29,7 @@ public class traces {
 		this.subject = subject;
 	}
 
-	public boolean equals(traces t) {
+	public boolean equals(tracesmethods t) {
 		if( classid.equals(t.classid) && requirementid.equals(t.requirementid)  && fullmethod.equals(t.fullmethod)   && methodid.equals(t.methodid)  && classname.equals(t.classname)
 				&& classid.equals(t.classid) && gold.equals(t.gold)  && subject.equals(t.subject)) {
 			return true; 
@@ -37,8 +37,8 @@ public class traces {
 	return false; 
 	}
 	
-	public boolean contains(List<traces> TraceList, traces t) {
-		for(traces tr: TraceList) {
+	public boolean contains(List<tracesmethods> TraceList, tracesmethods t) {
+		for(tracesmethods tr: TraceList) {
 			if(t.equals(tr)) {
 				return true; 
 			}

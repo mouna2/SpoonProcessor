@@ -1397,7 +1397,9 @@ catch (IOException e) {
  String classname=null; 
  String classid=null; 
  String requirementid=null; 
- List<traces> TraceList= new ArrayList<traces>(); 
+ String goldvalue=null; 
+ String subjectvalue=null; 
+ List<tracesmethods> TraceList= new ArrayList<tracesmethods>(); 
 try {
 	
 	line = bufferedReader.readLine(); 
@@ -1433,7 +1435,21 @@ try {
 		while(requirements.next()){
 			requirementid = requirements.getString("id"); 
 			   }
-		traces tr= new traces(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
+		
+		ResultSet goldvalues = st.executeQuery("SELECT traces.gold from traces where traces.requirementid ='"+requirementid+"' and traces.classid='"+classid+"'"); 
+		while(goldvalues.next()){
+			goldvalue = goldvalues.getString("gold"); 
+			   }
+	
+		ResultSet subjectvalues = st.executeQuery("SELECT traces.subject from traces where traces.requirementid ='"+requirementid+"' and traces.classid='"+classid+"'"); 
+		while(subjectvalues.next()){
+			subjectvalue = subjectvalues.getString("subject"); 
+			   }
+	
+		
+		
+		
+		tracesmethods tr= new tracesmethods(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
 		if(tr.contains(TraceList, tr)==false) {
 			String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"')";		
 			st.executeUpdate(statement);
