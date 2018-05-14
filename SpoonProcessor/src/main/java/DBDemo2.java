@@ -160,39 +160,39 @@ public class DBDemo2 {
 		   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `superclassid` INT NULL,\r\n" + 
 		   		"  `superclassname` LONGTEXT NULL,\r\n" + 
-		   		"  `childclassid` INT NULL,\r\n" + 
+		   		"  `ownerclassid` INT NULL,\r\n" + 
 		   		"  `childclassname` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  INDEX `superclassid_idx` (`superclassid` ASC),\r\n" + 
-		   		"  INDEX `childclassid_idx` (`childclassid` ASC),\r\n" + 
+		   		"  INDEX `ownerclassid_idx` (`ownerclassid` ASC),\r\n" + 
 		   		"  CONSTRAINT `superclassid`\r\n" + 
 		   		"    FOREIGN KEY (`superclassid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION,\r\n" + 
-		   		"  CONSTRAINT `childclassid`\r\n" + 
-		   		"    FOREIGN KEY (`childclassid`)\r\n" + 
+		   		"  CONSTRAINT `ownerclassid`\r\n" + 
+		   		"    FOREIGN KEY (`ownerclassid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
 		   
 		   st.executeUpdate("CREATE TABLE `databasechess`.`interfaces` (\r\n" + 
 		   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 	   	
-		   		"  `interfaceid` INT NULL,\r\n" + 
+		   		"  `interfaceclassid` INT NULL,\r\n" + 
 		   		"  `interfacename` LONGTEXT NULL,\r\n" + 
-		   		"  `classid` INT NULL,\r\n" + 
+		   		"  `ownerclassid` INT NULL,\r\n" + 
 		   		"  `classname` LONGTEXT NULL,\r\n" +	   		
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
-		   		"  INDEX `interfaceid_idx` (`interfaceid` ASC),\r\n" + 
-		   		"  INDEX `classid_idx` (`classid` ASC),\r\n" + 
-		   		"  CONSTRAINT `interfaceid`\r\n" + 
-		   		"    FOREIGN KEY (`interfaceid`)\r\n" + 
+		   		"  INDEX `interfaceclassid_idx` (`interfaceclassid` ASC),\r\n" + 
+		   		"  INDEX `classid_idx` (`ownerclassid` ASC),\r\n" + 
+		   		"  CONSTRAINT `interfaceclassid`\r\n" + 
+		   		"    FOREIGN KEY (`interfaceclassid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION,\r\n" + 
-		   		"  CONSTRAINT `classid`\r\n" + 
-		   		"    FOREIGN KEY (`classid`)\r\n" + 
+		   		"  CONSTRAINT `ownerclassid2`\r\n" + 
+		   		"    FOREIGN KEY (`ownerclassid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
@@ -246,20 +246,20 @@ public class DBDemo2 {
 		   st.executeUpdate("CREATE TABLE `databasechess`.`fieldclasses` (\r\n" + 
 		   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `fieldname` LONGTEXT NULL,\r\n" + 
-		   		"  `fieldid` INT NULL,\r\n" + 
+		   		"  `fieldtypeclassid` INT NULL,\r\n" + 
 		   		"  `fieldtype` LONGTEXT NULL,\r\n" + 
-		   		"  `classid` INT NULL,\r\n" + 
+		   		"  `ownerclassid` INT NULL,\r\n" + 
 		   		"  `classname` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
-		   		"  INDEX `classid_idx` (`classid` ASC),\r\n" + 
-		   		"  INDEX `classid_idx2` (`classid` ASC),\r\n" + 	
+		   		"  INDEX `classid_idx` (`ownerclassid` ASC),\r\n" + 
+		   		"  INDEX `classid_idx2` (`ownerclassid` ASC),\r\n" + 	
 		   		"  CONSTRAINT `classid4`\r\n" + 
-		   		"    FOREIGN KEY (`classid`)\r\n" + 
+		   		"    FOREIGN KEY (`ownerclassid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION,"+ 
 		   		"  CONSTRAINT `classid6`\r\n" + 
-		   		"    FOREIGN KEY (`fieldid`)\r\n" + 
+		   		"    FOREIGN KEY (`fieldtypeclassid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
@@ -269,28 +269,28 @@ public class DBDemo2 {
 		   st.executeUpdate("CREATE TABLE `databasechess`.`fieldmethods` (\r\n" + 
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `fieldaccess` VARCHAR(200) NULL,\r\n" + 
-		   		"  `fieldid` INT NULL,\r\n" + 
+		   		"  `fieldtypeclassid` INT NULL,\r\n" + 
 		   		"  `fieldtype` LONGTEXT NULL,\r\n" + 
 		   		"  `classname` VARCHAR(200) NULL,\r\n" + 
-		   		"  `classid` INT NULL,\r\n" + 
+		   		"  `ownerclassid` INT NULL,\r\n" + 
 		   		"  `methodname` VARCHAR(200) NULL,\r\n" + 
-		   		"  `methodid` INT NULL,\r\n" + 
+		   		"  `ownermethodid` INT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
-		   		"  INDEX `classid_idx` (`classid` ASC),\r\n" + 
-		   		"  INDEX `methodid_idx` (`methodid` ASC),\r\n" + 		
+		   		"  INDEX `classid_idx` (`fieldtypeclassid` ASC),\r\n" + 
+		   		"  INDEX `methodid_idx` (`ownermethodid` ASC),\r\n" + 		
 		   		"  CONSTRAINT `classid5`\r\n" + 
-		   		"    FOREIGN KEY (`classid`)\r\n" + 
+		   		"    FOREIGN KEY (`fieldtypeclassid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION,\r\n" + 
 		   		"  CONSTRAINT `classid7`\r\n" + 
-		   		"    FOREIGN KEY (`fieldid`)\r\n" + 
+		   		"    FOREIGN KEY (`fieldtypeclassid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION,\r\n" + 
 		   		"  CONSTRAINT `methodid2`\r\n" + 
-		   		"    FOREIGN KEY (`methodid`)\r\n" + 
+		   		"    FOREIGN KEY (`ownermethodid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
@@ -298,32 +298,32 @@ public class DBDemo2 {
 
 		   st.executeUpdate("CREATE TABLE `databasechess`.`methodcalls` (\r\n" + 
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
-		   		"  `callerid` INT NULL,\r\n" + 
+		   		"  `callermethodid` INT NULL,\r\n" + 
 		   		"  `callername` LONGTEXT NULL,\r\n" + 
 		   		"  `callerclass` LONGTEXT NULL,\r\n" + 
-		   		"  `calleeid` INT NULL,\r\n" + 
+		   		"  `calleemethodid` INT NULL,\r\n" + 
 		   		"  `calleename` LONGTEXT NULL,\r\n" + 
 		   		"  `calleeclass` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
-		   		"  INDEX `caller_idx` (`callerid` ASC),\r\n" + 
-		   		"  INDEX `callee_idx` (`calleeid` ASC),\r\n" + 
+		   		"  INDEX `caller_idx` (`callermethodid` ASC),\r\n" + 
+		   		"  INDEX `callee_idx` (`calleemethodid` ASC),\r\n" + 
 		   		"  CONSTRAINT `methodcalledid`\r\n" + 
-		   		"    FOREIGN KEY (`callerid`)\r\n" + 
+		   		"    FOREIGN KEY (`callermethodid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION,\r\n" + 
 		   		"  CONSTRAINT `callingmethodid`\r\n" + 
-		   		"    FOREIGN KEY (`calleeid`)\r\n" + 
+		   		"    FOREIGN KEY (`calleemethodid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
 		   		"    ON UPDATE NO ACTION);"); 
 		   st.executeUpdate("CREATE TABLE `databasechess`.`methodcallsexecuted` (\r\n" + 
 			   		"  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
-			   		"  `callerid` LONGTEXT NULL,\r\n" + 
+			   		"  `callermethodid` LONGTEXT NULL,\r\n" + 
 			   		"  `callername` LONGTEXT NULL,\r\n" + 
 			   		"  `callerclass` LONGTEXT NULL,\r\n" + 
-			   		"  `calleeid` LONGTEXT NULL,\r\n" + 
+			   		"  `calleemethodid` LONGTEXT NULL,\r\n" + 
 			   		"  `calleename` LONGTEXT NULL,\r\n" + 
 			   		"  `calleeclass` LONGTEXT NULL,\r\n" + 
 			   		"  PRIMARY KEY (`id`),\r\n" + 
@@ -472,7 +472,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
     					
     			String result= "SELECT classname from classes where classname='"+FullClassName+"'"; 
     			if(superclassQuery!=null)
-    			st.executeUpdate("INSERT INTO `superclasses`(`superclassid`, `superclassname`, `childclassid`, `childclassname`) VALUES ('"+superclassQuery +"','" +superclassQueryName+"','" +childclassQuery+"','" +childclassQueryName+"')");
+    			st.executeUpdate("INSERT INTO `superclasses`(`superclassid`, `superclassname`, `ownerclassid`, `childclassname`) VALUES ('"+superclassQuery +"','" +superclassQueryName+"','" +childclassQuery+"','" +childclassQueryName+"')");
     			
     		
     		
@@ -491,7 +491,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
     	for(CtType<?> clazz : classFactory.getAll()) {
     		
     		
-    		String myinterfaceid = null;
+    		String myinterfaceclassid = null;
     		String myinterfacename = null;
     		String myclassid = null;
     		String myclassname = null;
@@ -510,7 +510,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 					
 					ResultSet interfacesclasses = st.executeQuery("SELECT id from classes where classname='"+inter+"'"); 
 					while(interfacesclasses.next()){
-						myinterfaceid= interfacesclasses.getString("id"); 
+						myinterfaceclassid= interfacesclasses.getString("id"); 
 				//		System.out.println("interface: "+myinterface);	
 			   		   }
 					
@@ -526,7 +526,7 @@ if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(claz
 				//		System.out.println("class referenced: "+myclass);	
 			   		   }
 					
-	    			st.executeUpdate("INSERT INTO `interfaces`(`interfaceid`,`interfacename`,`classid`, `classname`) VALUES ('"+myinterfaceid +"','" +myinterfacename+"','" +myclassid+"','" +myclassname+"')");
+	    			st.executeUpdate("INSERT INTO `interfaces`(`interfaceclassid`,`interfacename`,`ownerclassid`, `classname`) VALUES ('"+myinterfaceclassid +"','" +myinterfacename+"','" +myclassid+"','" +myclassname+"')");
 				}
 				
 			}
@@ -818,7 +818,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 			
 		//	if(field.toString().contains("java.awt")==false && field.toString().contains("javax")==false) {
 			if(fieldid!=null && flag==true) {
-    			st.executeUpdate("INSERT INTO `fieldclasses`(`fieldname`, `fieldid`, `fieldtype`, `classid`,  `classname`) VALUES ('"+field.getSimpleName() +"','"+fieldid +"','"+field.getType() +"','" +myclass+"','" +myclassname+"')");
+    			st.executeUpdate("INSERT INTO `fieldclasses`(`fieldname`, `fieldtypeclassid`, `fieldtype`, `ownerclassid`,  `classname`) VALUES ('"+field.getSimpleName() +"','"+fieldid +"','"+field.getType() +"','" +myclass+"','" +myclassname+"')");
 
 			}
 
@@ -897,7 +897,7 @@ ResultSet methodnames = st.executeQuery("SELECT methodname from methods where me
 		
 			
 				if(myfield.contains(FieldMethodsList, myfield)==false && FieldName!=null && flag==true) {
-					st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`, `fieldid`, `fieldtype`,  `classname`,  `classid`,  `methodname`, `methodid`) VALUES ('"+FieldName +"','" +fieldid+"','" +fieldaccess.getType()+"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
+					st.executeUpdate("INSERT INTO `fieldmethods`(`fieldaccess`, `fieldtypeclassid`, `fieldtype`,  `classname`,  `ownerclassid`,  `methodname`, `ownermethodid`) VALUES ('"+FieldName +"','" +fieldid+"','" +fieldaccess.getType()+"','" +myclassname+"','" +myclass+"','" +MethodName+"','" +Methodid+"')");
 					FieldMethodsList.add(myfield); 
 				}
 			
@@ -980,7 +980,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 			
 			
 			if(methodcall.contains(methodcallsList, methodcall)==false && callingmethodsrefinedname!=null && callingmethodsrefinedid!=null && callingmethodclass!=null && calledmethodclass!=null && calledmethodname!=null && calledmethodid!=null) {
-				String statement = "INSERT INTO `methodcalls`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+calledmethodid +"','" +calledmethodname+"','" +calledmethodclass+"','" +callingmethodsrefinedid+"','" +callingmethodsrefinedname+"','" +callingmethodclass+"')";
+				String statement = "INSERT INTO `methodcalls`(`callermethodid`,  `callername`,  `callerclass`,`calleemethodid`,  `calleename`, `calleeclass`) VALUES ('"+calledmethodid +"','" +calledmethodname+"','" +calledmethodclass+"','" +callingmethodsrefinedid+"','" +callingmethodsrefinedname+"','" +callingmethodclass+"')";
 				
 				st.executeUpdate(statement);
 				methodcallsList.add(methodcall); 
@@ -1150,7 +1150,7 @@ try {
 		System.out.println(mce.toString()); 	
 		if(mce.contains(methodcallsexecutedlist, mce)==false) {
 			if(callingmethodsrefinedid!=null && calledmethodid!=null ) {
-				String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROMTransformed+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTOTransformed+"','" +ClassTO +"')";		
+				String statement = "INSERT INTO `methodcallsexecuted`(`callermethodid`,  `callername`,  `callerclass`,`calleemethodid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROMTransformed+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTOTransformed+"','" +ClassTO +"')";		
 				st.executeUpdate(statement);
 				methodcallsexecutedlist.add(mce); 
 			}
@@ -1297,13 +1297,13 @@ try {
 						   }*/
 					
 					//insert into methodcallsexecuted table 
-					String statement = "INSERT INTO `methodcallsexecuted`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROMTransformed+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTOTransformed+"','" +ClassTO +"')";		
+					String statement = "INSERT INTO `methodcallsexecuted`(`callermethodid`,  `callername`,  `callerclass`,`calleemethodid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROMTransformed+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTOTransformed+"','" +ClassTO +"')";		
 					st.executeUpdate(statement);
 					methodcallsexecutedlist.add(mce); 	
 					
 					
 				//insert into methodcalls table as well 
-					String statement2 = "INSERT INTO `methodcalls`(`callerid`,  `callername`,  `callerclass`,`calleeid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROMTransformed+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTOTransformed+"','" +ClassTO +"')";		
+					String statement2 = "INSERT INTO `methodcalls`(`callermethodid`,  `callername`,  `callerclass`,`calleemethodid`,  `calleename`, `calleeclass`) VALUES ('"+callingmethodsrefinedid+"','" +MethodFROMTransformed+"','" +ClassFROM+"','"+calledmethodid +"','" +MethodTOTransformed+"','" +ClassTO +"')";		
 					st.executeUpdate(statement2);
 				
 					
