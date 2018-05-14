@@ -1397,6 +1397,7 @@ catch (IOException e) {
  String classname=null; 
  String classid=null; 
  String requirementid=null; 
+ List<traces> TraceList= new ArrayList<traces>(); 
 try {
 	
 	line = bufferedReader.readLine(); 
@@ -1407,12 +1408,17 @@ try {
 		requirement=linesplitted[2]; 
 		gold=linesplitted[4]; 
 		subject=linesplitted[5]; 
-		
 		String shortmethod=method.substring(0, method.indexOf("(")); 
-		ResultSet methodids = st.executeQuery("SELECT methods.id from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
-		while(methodids.next()){
-			methodid = methodids.getString("id"); 
-			   }
+		  String[] parts = shortmethod.split("[$]", 2);
+		shortmethod=parts[0]; 
+		shortmethod=shortmethod.replaceAll("clinit", "init"); 
+		System.out.println("HERE IS THIS SHORT METHOD========>"+ shortmethod); 
+			ResultSet methodids = st.executeQuery("SELECT methods.id from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+			while(methodids.next()){
+				methodid = methodids.getString("id"); 
+				   }
+		
+		
 		
 		ResultSet classnames = st.executeQuery("SELECT methods.classname from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
 		while(classnames.next()){
@@ -1427,8 +1433,13 @@ try {
 		while(requirements.next()){
 			requirementid = requirements.getString("id"); 
 			   }
-		String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"')";		
-		st.executeUpdate(statement);
+		traces tr= new traces(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
+		if(tr.contains(TraceList, tr)==false) {
+			String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"')";		
+			st.executeUpdate(statement);
+			TraceList.add(tr); 
+		}
+		
 	
 		
 		
