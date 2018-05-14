@@ -354,7 +354,17 @@ public class DBDemo2 {
 		   		"  `requirementname` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  UNIQUE INDEX `id_UNIQUE` (`id` ASC));"); 
-			 
+			 st.executeUpdate("CREATE TABLE `databasechess`.`tracesclasses` (\r\n" + 
+			 		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
+			 		"  `requirement` LONGTEXT NULL,\r\n" + 
+			 		"  `requirementid` INT NULL,\r\n" + 
+			 		"  `classname` LONGTEXT NULL,\r\n" + 
+			 		"  `classid` INT NULL,\r\n" + 
+			 		"  `gold` LONGTEXT NULL,\r\n" + 
+			 		"  `subject` LONGTEXT NULL,\r\n" + 
+			 		"  PRIMARY KEY (`id`),\r\n" + 
+			 		"  UNIQUE INDEX `idtracesclasses_UNIQUE` (`id` ASC));\r\n" + 
+			 		""); 
 		   
 		   try {
 			Spoon();
@@ -1397,9 +1407,10 @@ catch (IOException e) {
  String classname=null; 
  String classid=null; 
  String requirementid=null; 
- String goldvalue=null; 
- String subjectvalue=null; 
- List<tracesmethods> TraceList= new ArrayList<tracesmethods>(); 
+
+ List<tracesmethods> TraceListMethods= new ArrayList<tracesmethods>();
+ List<tracesclasses> TraceListClasses= new ArrayList<tracesclasses>(); 
+
 try {
 	
 	line = bufferedReader.readLine(); 
@@ -1436,8 +1447,80 @@ try {
 			requirementid = requirements.getString("id"); 
 			   }
 		
-		ResultSet goldvalues = st.executeQuery("SELECT traces.gold from traces where traces.requirementid ='"+requirementid+"' and traces.classid='"+classid+"'"); 
-		while(goldvalues.next()){
+		
+		
+		
+		
+		tracesmethods tr= new tracesmethods(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
+		if(tr.contains(TraceListMethods, tr)==false) {
+			String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"')";		
+			st.executeUpdate(statement);
+			TraceListMethods.add(tr); 
+			
+			
+		}
+		
+		
+		
+		
+		
+	
+		
+		
+	}
+	
+	
+
+}
+catch (IOException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+	/*********************************************************************************************************************************************************************************/	
+	/*********************************************************************************************************************************************************************************/	
+	/*********************************************************************************************************************************************************************************/   
+	try {
+		file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Traces.txt");
+		fileReader = new FileReader(file);
+		bufferedReader = new BufferedReader(fileReader);	
+		line = bufferedReader.readLine(); 
+		while ((line = bufferedReader.readLine()) != null) {
+			System.out.println(line);
+			String[] linesplitted = line.split(","); 
+			method=linesplitted[1]; 
+			requirement=linesplitted[2]; 
+			gold=linesplitted[4]; 
+			subject=linesplitted[5]; 
+			String shortmethod=method.substring(0, method.indexOf("(")); 
+			  String[] parts = shortmethod.split("[$]", 2);
+			shortmethod=parts[0]; 
+			shortmethod=shortmethod.replaceAll("clinit", "init"); 
+			System.out.println("HERE IS THIS SHORT METHOD========>"+ shortmethod); 
+	 String goldvalue=null; 
+	 String subjectvalue=null; 
+		
+	
+	
+	
+	ResultSet classnames = st.executeQuery("SELECT methods.classname from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+	while(classnames.next()){
+		classname = classnames.getString("classname"); 
+		   }
+	
+	ResultSet classids = st.executeQuery("SELECT methods.classid from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+	while(classids.next()){
+		classid = classids.getString("classid"); 
+		   }
+	
+	
+	ResultSet requirements = st.executeQuery("SELECT requirements.id from requirements where requirements.requirementname ='"+requirement+"'"); 
+	while(requirements.next()){
+		requirementid = requirements.getString("id"); 
+		   }	
+	 
+	
+	ResultSet goldvalues = st.executeQuery("SELECT traces.gold from traces where traces.requirementid ='"+requirementid+"' and traces.classid='"+classid+"'"); 
+	 while(goldvalues.next()){
 			goldvalue = goldvalues.getString("gold"); 
 			   }
 	
@@ -1446,37 +1529,33 @@ try {
 			subjectvalue = subjectvalues.getString("subject"); 
 			   }
 	
-		
-		
-		
-		tracesmethods tr= new tracesmethods(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
-		if(tr.contains(TraceList, tr)==false) {
-			String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"')";		
-			st.executeUpdate(statement);
-			TraceList.add(tr); 
+	 
+	 
+	 tracesclasses tc= new tracesclasses(requirement, requirementid,  classname, classid, goldvalue, subjectvalue); 
+		if(tc.contains(TraceListClasses, tc)==false) {
+			String statement2= "INSERT INTO `tracesclasses`(`requirement`, `requirementid`,  `classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','"  +classname+"','" +classid+"','"+goldvalue +"','" +subjectvalue+"')";	
+			st.executeUpdate(statement2); 
+			TraceListClasses.add(tc); 
 		}
-		
-		
-		
+	
+	
+
 		
 	
-		
-		
+
+
+
+		}
+	
+	
+	
+	
 	}
-
-
-
-
+	catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
 	}
-	
-catch (IOException e) {
-	// TODO Auto-generated catch block
-	e.printStackTrace();
-}
-
-	
-}
-	
+	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	public String transformstring(String s) {
