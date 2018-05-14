@@ -331,6 +331,7 @@ public class DBDemo2 {
 		   st.executeUpdate("CREATE TABLE `databasechess`.`traces` (\r\n" + 
 		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
 		   		"  `requirement` LONGTEXT NULL,\r\n" + 
+		   		"  `requirementid` INT,\r\n" + 
 		   		"  `method` LONGTEXT NULL,\r\n" + 
 		   		"  `fullmethod` LONGTEXT NULL,\r\n" +
 		   		"  `methodid` INT NULL,\r\n" + 
@@ -344,7 +345,7 @@ public class DBDemo2 {
 		   		"    FOREIGN KEY (`methodid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
-		   		"    ON UPDATE NO ACTION);\r\n" + 
+		   		"    ON UPDATE NO ACTION);\r\n" + 	
 		   		""); 
 		 
 		   
@@ -1340,70 +1341,11 @@ try {
 
 //System.out.println("Contents of file:");
 //System.out.println(stringBuffer.toString());
-/*********************************************************************************************************************************************************************************/	
-/*********************************************************************************************************************************************************************************/	
-/*********************************************************************************************************************************************************************************/   
-//CREATE TRACES TABLE 
-
- file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Traces.txt");
- fileReader = new FileReader(file);
- bufferedReader = new BufferedReader(fileReader);
- stringBuffer = new StringBuffer();
- String requirement=null; 
- String method=null; 
- String gold=null; 
- String subject=null; 
- String methodid=null; 
- String classname=null; 
- String classid=null; 
-try {
-	
-	line = bufferedReader.readLine(); 
-	while ((line = bufferedReader.readLine()) != null) {
-		System.out.println(line);
-		String[] linesplitted = line.split(","); 
-		method=linesplitted[1]; 
-		requirement=linesplitted[2]; 
-		gold=linesplitted[4]; 
-		subject=linesplitted[5]; 
-		
-		String shortmethod=method.substring(0, method.indexOf("(")); 
-		ResultSet methodids = st.executeQuery("SELECT methods.id from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
-		while(methodids.next()){
-			methodid = methodids.getString("id"); 
-			   }
-		
-		ResultSet classnames = st.executeQuery("SELECT methods.classname from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
-		while(classnames.next()){
-			classname = classnames.getString("classname"); 
-			   }
-		
-		ResultSet classids = st.executeQuery("SELECT methods.classid from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
-		while(classids.next()){
-			classid = classids.getString("classid"); 
-			   }
-		
-		String statement = "INSERT INTO `traces`(`requirement`,  `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"')";		
-		st.executeUpdate(statement);
-	
-		
-		
-	}
-
-
-
-
-	}
-	
-catch (IOException e) {
-	// TODO Auto-generated catch block
-	e.printStackTrace();
-}
 
 /*********************************************************************************************************************************************************************************/	
 /*********************************************************************************************************************************************************************************/	
 /*********************************************************************************************************************************************************************************/   
-//CREATE TRACES TABLE 
+//CREATE REQUIREMENTS TABLE 
 
  file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Requirements.txt");
  fileReader = new FileReader(file);
@@ -1436,7 +1378,73 @@ try {
 catch (IOException e) {
 	// TODO Auto-generated catch block
 	e.printStackTrace();
-}	
+}
+
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/   
+//CREATE TRACES TABLE 
+
+ file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Traces.txt");
+ fileReader = new FileReader(file);
+ bufferedReader = new BufferedReader(fileReader);
+ stringBuffer = new StringBuffer();
+ String requirement=null; 
+ String method=null; 
+ String gold=null; 
+ String subject=null; 
+ String methodid=null; 
+ String classname=null; 
+ String classid=null; 
+ String requirementid=null; 
+try {
+	
+	line = bufferedReader.readLine(); 
+	while ((line = bufferedReader.readLine()) != null) {
+		System.out.println(line);
+		String[] linesplitted = line.split(","); 
+		method=linesplitted[1]; 
+		requirement=linesplitted[2]; 
+		gold=linesplitted[4]; 
+		subject=linesplitted[5]; 
+		
+		String shortmethod=method.substring(0, method.indexOf("(")); 
+		ResultSet methodids = st.executeQuery("SELECT methods.id from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+		while(methodids.next()){
+			methodid = methodids.getString("id"); 
+			   }
+		
+		ResultSet classnames = st.executeQuery("SELECT methods.classname from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+		while(classnames.next()){
+			classname = classnames.getString("classname"); 
+			   }
+		
+		ResultSet classids = st.executeQuery("SELECT methods.classid from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+		while(classids.next()){
+			classid = classids.getString("classid"); 
+			   }
+		ResultSet requirements = st.executeQuery("SELECT requirements.id from requirements where requirements.requirementname ='"+requirement+"'"); 
+		while(requirements.next()){
+			requirementid = requirements.getString("id"); 
+			   }
+		String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"')";		
+		st.executeUpdate(statement);
+	
+		
+		
+	}
+
+
+
+
+	}
+	
+catch (IOException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+	
 }
 	
 	
