@@ -1028,7 +1028,7 @@ for(CtType<?> clazz : classFactory.getAll()) {
 /*********************************************************************************************************************************************************************************/	
 /*********************************************************************************************************************************************************************************/   	
 //BUILD METHODSCALLED EXECUTED TABLE
-File file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\data");
+File file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\data.txt");
 FileReader fileReader = new FileReader(file);
 BufferedReader bufferedReader = new BufferedReader(fileReader);
 StringBuffer stringBuffer = new StringBuffer();
