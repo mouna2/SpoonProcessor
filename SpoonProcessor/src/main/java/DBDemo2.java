@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -89,8 +90,26 @@ public class DBDemo2 {
 	
 	/** The name of the table we are testing with */
 	private final String tableName = "classes";
+	public List<tracesmethodscallees> TracesCalleesList= new ArrayList<tracesmethodscallees>();
+
 	
-	
+	public DBDemo2(List<tracesmethodscallees> tracesCalleesList) {
+		 TracesCalleesList= new ArrayList<tracesmethodscallees>();
+
+	}
+
+	public DBDemo2() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public List<tracesmethodscallees> getTracesCalleesList() {
+		return TracesCalleesList;
+	}
+
+	public void setTracesCalleesList(List<tracesmethodscallees> tracesCalleesList) {
+		TracesCalleesList = tracesCalleesList;
+	}
+
 	/**
 	 * Get a new database connection
 	 * 
@@ -1411,8 +1430,9 @@ catch (IOException e) {
  String requirementid=null; 
 String calleeid=null; 
 String goldprediction=null; 
+String calleeidexecuted=null; 
  List<tracesmethods> TraceListMethods= new ArrayList<tracesmethods>();
-List<tracesmethodscallees> TracesCalleesList= new ArrayList<tracesmethodscallees>();
+tracesmethodscallees tmc = null; 
 try {
 	
 	line = bufferedReader.readLine(); 
@@ -1450,17 +1470,31 @@ try {
 			   }
 		// Rule: if method A calls method B and method A implements requirement X, then I can just assume that method B implements requirement X as well 
 		// Retrieving the calleeid
-		ResultSet callees = st.executeQuery("SELECT methodcalls.calleemethodid from methodcalls where methodcalls.callermethodid ='"+methodid+"'"); 
-		while(callees.next()){
-			 calleeid = callees.getString("calleemethodid"); 
-			   }
 		
+			ResultSet calleesparsed = st.executeQuery("SELECT methodcalls.calleemethodid from methodcalls where methodcalls.callermethodid ='"+methodid+"'"); 
+			while(calleesparsed.next()){
+				 calleeid = calleesparsed.getString("calleemethodid"); 
+				   }
+			ResultSet calleesexecuted = st.executeQuery("SELECT methodcallsexecuted.calleemethodid from methodcallsexecuted where methodcallsexecuted.callermethodid ='"+methodid+"'"); 
+			while(calleesexecuted.next()){
+				 calleeidexecuted = calleesexecuted.getString("calleemethodid"); 
+				   }
+	
 		
-		tracesmethodscallees tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, goldprediction, subject, calleeid); 
+		//insert into tracesmethodscallees a new object: if is found in the methodcalls table, then use the value from there 
+		//otherwise, use the value from the methodcallsexecuted table 
+			if(calleeid!=null) {
+				 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, calleeid); 
+				 TracesCalleesList.add(tmc); 
+			}
+			else if(calleeidexecuted!=null) {
+				 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, calleeidexecuted); 
+				 TracesCalleesList.add(tmc); 
+			}
 		tracesmethods tr= new tracesmethods(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
-		TracesCalleesList.add(tmc); 
+		
 		if(tr.contains(TraceListMethods, tr)==false) {
-			
+		  
 			String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`, `goldprediction`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"','" +goldprediction+"')";		
 			st.executeUpdate(statement);
 			TraceListMethods.add(tr); 
@@ -1484,6 +1518,32 @@ catch (IOException e) {
 	// TODO Auto-generated catch block
 	e.printStackTrace();
 }
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/	
+/*********************************************************************************************************************************************************************************/   
+//make prediction on the column goldprediction 
+
+
+/*for(tracesmethodscallees tc: TracesCalleesList) {
+	
+
+	System.out.println("tc.gold===============================================================>"+tc.gold); 
+	System.out.println("tc.callee===============================================================>"+tc.callee); 
+	 String query = "update traces set goldprediction = ? where methodid = ? ";
+     PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
+     pstmt.setString(1, tc.gold); // set input parameter 1
+     pstmt.setString(2, tc.callee); // set input parameter 2
+     pstmt.executeUpdate(); // execute update statement
+	
+	//PreparedStatement preparedstatement = conn.prepareStatement("update table `databasechess`.`traces` SET `traces`.`goldprediction`='"+tc.gold+"' where `traces`.`methodid`='"+tc.callee+"'"); 
+	// int goldpredictions = preparedstatement.executeUpdate();
+	// conn.commit();
+	// preparedstatement.close();
+	
+	
+	
+}*/
+
 	/*********************************************************************************************************************************************************************************/	
 	/*********************************************************************************************************************************************************************************/	
 	/*********************************************************************************************************************************************************************************/   
@@ -1613,4 +1673,10 @@ try {
 		 String[] data = Paramlist.split(",");
 		 return data; 
 	}
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	
+public List<tracesmethodscallees> GetList() {
+			return TracesCalleesList; 
+}
 }
