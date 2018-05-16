@@ -1524,15 +1524,16 @@ catch (IOException e) {
 //make prediction on the column goldprediction 
 
 
-/*for(tracesmethodscallees tc: TracesCalleesList) {
+for(tracesmethodscallees tc: TracesCalleesList) {
 	
 
 	System.out.println("tc.gold===============================================================>"+tc.gold); 
 	System.out.println("tc.callee===============================================================>"+tc.callee); 
-	 String query = "update traces set goldprediction = ? where methodid = ? ";
+	 String query = "update traces set goldprediction = ? where methodid = ? and requirementid = ?";
      PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
      pstmt.setString(1, tc.gold); // set input parameter 1
      pstmt.setString(2, tc.callee); // set input parameter 2
+     pstmt.setString(3, tc.requirementid); // set input parameter 3
      pstmt.executeUpdate(); // execute update statement
 	
 	//PreparedStatement preparedstatement = conn.prepareStatement("update table `databasechess`.`traces` SET `traces`.`goldprediction`='"+tc.gold+"' where `traces`.`methodid`='"+tc.callee+"'"); 
@@ -1542,7 +1543,7 @@ catch (IOException e) {
 	
 	
 	
-}*/
+}
 
 	/*********************************************************************************************************************************************************************************/	
 	/*********************************************************************************************************************************************************************************/	
