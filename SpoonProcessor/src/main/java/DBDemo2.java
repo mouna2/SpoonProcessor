@@ -340,6 +340,7 @@ public class DBDemo2 {
 		   		"  `classid` LONGTEXT NULL,\r\n" + 
 		   		"  `gold` LONGTEXT NULL,\r\n" + 
 		   		"  `subject` LONGTEXT NULL,\r\n" + 
+		   		"  `goldprediction` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  INDEX `methodid_idx8` (`methodid` ASC),\r\n" + 
 		   		"  CONSTRAINT `methodid8`\r\n" + 
@@ -1408,7 +1409,8 @@ catch (IOException e) {
  String classname=null; 
  String classid=null; 
  String requirementid=null; 
-
+String calleeid=null; 
+String goldprediction=null; 
  List<tracesmethods> TraceListMethods= new ArrayList<tracesmethods>();
 
 try {
@@ -1446,14 +1448,19 @@ try {
 		while(requirements.next()){
 			requirementid = requirements.getString("id"); 
 			   }
-		
-		
+		// Rule: if method A calls method B and method A implements requirement X, then I can just assume that method B implements requirement X as well 
+		// Retrieving the calleeid
+		ResultSet callees = st.executeQuery("SELECT methodcalls.calleemethodid from methodcalls where methodcalls.callermethodid ='"+methodid+"'"); 
+		while(callees.next()){
+			 calleeid = callees.getString("calleemethodid"); 
+			   }
 		
 		
 		
 		tracesmethods tr= new tracesmethods(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
 		if(tr.contains(TraceListMethods, tr)==false) {
-			String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"')";		
+			
+			String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`, `goldprediction`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"','" +goldprediction+"')";		
 			st.executeUpdate(statement);
 			TraceListMethods.add(tr); 
 			
