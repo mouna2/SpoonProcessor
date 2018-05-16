@@ -1412,7 +1412,7 @@ catch (IOException e) {
 String calleeid=null; 
 String goldprediction=null; 
  List<tracesmethods> TraceListMethods= new ArrayList<tracesmethods>();
-
+List<tracesmethodscallees> TracesCalleesList= new ArrayList<tracesmethodscallees>();
 try {
 	
 	line = bufferedReader.readLine(); 
@@ -1456,8 +1456,9 @@ try {
 			   }
 		
 		
-		
+		tracesmethodscallees tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, goldprediction, subject, calleeid); 
 		tracesmethods tr= new tracesmethods(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
+		TracesCalleesList.add(tmc); 
 		if(tr.contains(TraceListMethods, tr)==false) {
 			
 			String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`, `goldprediction`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"','" +goldprediction+"')";		
