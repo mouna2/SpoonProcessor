@@ -1459,33 +1459,35 @@ try {
 		shortmethod=shortmethod.replaceAll("clinit", "init"); 
 		shortmethod=ParseLine(line); 
 		System.out.println("HERE IS THIS SHORT METHOD========>"+ shortmethod); 
+		methodid=null; 
 			ResultSet methodids = st.executeQuery("SELECT methods.id from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
 			while(methodids.next()){
 				methodid = methodids.getString("id"); 
 				   }
 		
 		
-		
+		 classname=null; 
 		ResultSet classnames = st.executeQuery("SELECT methods.classname from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
 		while(classnames.next()){
 			classname = classnames.getString("classname"); 
 			   }
-		
+		classid=null; 
 		ResultSet classids = st.executeQuery("SELECT methods.classid from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
 		while(classids.next()){
 			classid = classids.getString("classid"); 
 			   }
+		requirementid=null; 
 		ResultSet requirements = st.executeQuery("SELECT requirements.id from requirements where requirements.requirementname ='"+requirement+"'"); 
 		while(requirements.next()){
 			requirementid = requirements.getString("id"); 
 			   }
 		// Rule: if method A calls method B and method A implements requirement X, then I can just assume that method B implements requirement X as well 
 		// Retrieving the calleeid
-		
+		calleeid=null; 
 			ResultSet calleesparsed = st.executeQuery("SELECT methodcalls.calleemethodid from methodcalls where methodcalls.callermethodid ='"+methodid+"'"); 
 			while(calleesparsed.next()){
-				 calleeid = calleesparsed.getString("calleemethodid"); 
-				   }
+				 calleeid = calleesparsed.getString("calleemethodid"); }
+			calleeidexecuted=null; 	   
 			ResultSet calleesexecuted = st.executeQuery("SELECT methodcallsexecuted.calleemethodid from methodcallsexecuted where methodcallsexecuted.callermethodid ='"+methodid+"'"); 
 			while(calleesexecuted.next()){
 				 calleeidexecuted = calleesexecuted.getString("calleemethodid"); 
@@ -1494,7 +1496,7 @@ try {
 		
 		//insert into tracesmethodscallees a new object: if is found in the methodcalls table, then use the value from there 
 		//otherwise, use the value from the methodcallsexecuted table 
-			if(calleeid!=null) {
+			if(calleeid!=null && requirementid!=null) {
 				 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, calleeid); 
 				 TracesCalleesList.add(tmc); 
 			}
@@ -1503,16 +1505,18 @@ try {
 				 TracesCalleesList.add(tmc); 
 			}
 		tracesmethods tr= new tracesmethods(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
-		
-		if(tr.contains(TraceListMethods, tr)==false) {
-		  
-			String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`, `goldprediction`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"','" +goldprediction+"')";		
-			st.executeUpdate(statement);
-			TraceListMethods.add(tr); 
-			
+		if(methodid!=null && requirementid!=null && classid!=null) {
+			if(tr.contains(TraceListMethods, tr)==false) {
+				  
+				String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`, `goldprediction`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"','" +goldprediction+"')";		
+				st.executeUpdate(statement);
+				TraceListMethods.add(tr); 
+				
+				
+			}
 			
 		}
-		
+	
 		
 		
 		
@@ -1544,6 +1548,8 @@ for(tracesmethodscallees tc: TracesCalleesList) {
 
 	System.out.println("tc.gold===============================================================>"+tc.gold); 
 	System.out.println("tc.callee===============================================================>"+tc.callee); 
+	System.out.println("tc.requirementid===============================================================>"+tc.requirementid+   "------"+tc.callee); 
+
 	 String query = "update traces set goldprediction = ? where methodid = ? and requirementid = ?";
      PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
      pstmt.setString(1, tc.gold); // set input parameter 1
@@ -1592,67 +1598,73 @@ try {
 		
 	
 	
-	
+	classname=null; 
 	ResultSet classnames = st.executeQuery("SELECT methods.classname from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
 	while(classnames.next()){
 		classname = classnames.getString("classname"); 
 		   }
-	
+	classid=null; 
 	ResultSet classids = st.executeQuery("SELECT methods.classid from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
 	while(classids.next()){
 		classid = classids.getString("classid"); 
 		   }
 	
-	
+	requirementid=null; 
 	ResultSet requirements = st.executeQuery("SELECT requirements.id from requirements where requirements.requirementname ='"+requirement+"'"); 
 	while(requirements.next()){
 		requirementid = requirements.getString("id"); 
 		   }	
 	 
-	
+	goldvalue=null; 
 	ResultSet goldvalues = st.executeQuery("SELECT traces.gold from traces where traces.requirementid ='"+requirementid+"' and traces.classid='"+classid+"'"); 
 	 while(goldvalues.next()){
 			goldvalue = goldvalues.getString("gold"); 
 			   }
-	
+	subjectvalue=null; 
 		ResultSet subjectvalues = st.executeQuery("SELECT traces.subject from traces where traces.requirementid ='"+requirementid+"' and traces.classid='"+classid+"'"); 
 		while(subjectvalues.next()){
 			subjectvalue = subjectvalues.getString("subject"); 
 			   }
 		
 		//GoldSubjectValues goldsubject= new GoldSubjectValues(goldvalue, subjectvalue); 
-		RequirementClassKey RequirementClassKey= new RequirementClassKey(requirementid, requirement, classid, classname, goldvalue, subjectvalue); 
-		if(GoldHashTable.containsKey(RequirementClassKey)==false) {
-			GoldHashTable.put(RequirementClassKey, goldvalue); 
-		}
-		else if((GoldHashTable.get(RequirementClassKey).equals("T")==false) &&( RequirementClassKey.getGoldflag().equals("T")==false)  ) {
-			GoldHashTable.put(RequirementClassKey, goldvalue); 
+		if(requirementid!=null && classid!=null ) {
+			RequirementClassKey RequirementClassKey= new RequirementClassKey(requirementid, requirement, classid, classname, goldvalue, subjectvalue); 
+			if(GoldHashTable.containsKey(RequirementClassKey)==false) {
+				GoldHashTable.put(RequirementClassKey, goldvalue); 
+			}
+			else if((GoldHashTable.get(RequirementClassKey).equals("T")==false) &&( RequirementClassKey.getGoldflag().equals("T")==false)  ) {
+				GoldHashTable.put(RequirementClassKey, goldvalue); 
+			}
+		
+			else {
+				GoldHashTable.put(RequirementClassKey, goldvalue); 
+				RequirementClassKey.setGoldflag(goldvalue); 
+			}
+			
+			if(SubjectHashTable.containsKey(RequirementClassKey)==false) {
+				SubjectHashTable.put(RequirementClassKey, subjectvalue); 
+			}
+			
+			else if((SubjectHashTable.get(RequirementClassKey).equals("T")==false) && (RequirementClassKey.getSubjectflag().equals("T")==false) ) {
+				SubjectHashTable.put(RequirementClassKey, subjectvalue); 
+			}
+			else {
+				SubjectHashTable.put(RequirementClassKey, subjectvalue); 
+				RequirementClassKey.setSubjectflag(subjectvalue); 
+			}
+			if(RequirementClassKey.contains(RequirementClassKeys, RequirementClassKey)==false) {
+				String statement2= "INSERT INTO `tracesclasses`(`requirement`, `requirementid`,  `classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','"  +classname+"','" +classid+"','"+GoldHashTable.get(RequirementClassKey) +"','" +SubjectHashTable.get(RequirementClassKey)+"')";	
+				st.executeUpdate(statement2); 
+				RequirementClassKeys.add(RequirementClassKey); 
+			}
+		
+			
 		}
 	
-		else {
-			GoldHashTable.put(RequirementClassKey, goldvalue); 
-			RequirementClassKey.setGoldflag(goldvalue); 
-		}
-		if(SubjectHashTable.containsKey(RequirementClassKey)==false) {
-			SubjectHashTable.put(RequirementClassKey, subjectvalue); 
-		}
-		
-		else if((SubjectHashTable.get(RequirementClassKey).equals("T")==false) && (RequirementClassKey.getSubjectflag().equals("T")==false) ) {
-			SubjectHashTable.put(RequirementClassKey, subjectvalue); 
-		}
-		else {
-			SubjectHashTable.put(RequirementClassKey, subjectvalue); 
-			RequirementClassKey.setSubjectflag(subjectvalue); 
-		}
 		
 	 
 	
-		if(RequirementClassKey.contains(RequirementClassKeys, RequirementClassKey)==false) {
-			String statement2= "INSERT INTO `tracesclasses`(`requirement`, `requirementid`,  `classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','"  +classname+"','" +classid+"','"+GoldHashTable.get(RequirementClassKey) +"','" +SubjectHashTable.get(RequirementClassKey)+"')";	
-			st.executeUpdate(statement2); 
-			RequirementClassKeys.add(RequirementClassKey); 
-		}
-	
+		
 	
 
 		
