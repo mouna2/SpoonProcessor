@@ -27,7 +27,8 @@ public class Predictions {
 	/** The name of the table we are testing with */
 	private final String tableName = "classes";
 	DBDemo2 dbdemo = new DBDemo2(); 
-
+	static String methodid=null; 
+	static String classname=null; 
 	
 	/**
 	 * Get a new database connection
@@ -73,16 +74,25 @@ public class Predictions {
 		ResultSet rs = null; 
 		// Connect to MySQL
 		Connection conn = null;
-		try {
-			Predictions PRED= new Predictions(); 
-			conn = PRED.getConnection();
-			System.out.println("Connected to database");
-		} catch (SQLException e) {
-			System.out.println("ERROR: Could not connect to the database");
-			e.printStackTrace();
-			return;
-		}
+		Predictions PRED= new Predictions(); 
+		conn = PRED.getConnection();
+		Statement st= conn.createStatement();
+		System.out.println("Connected to database");
+		ResultSet methodids = st.executeQuery("SELECT methods.id from methods"); 
+		while(methodids.next()){
+			 methodid = methodids.getString("id"); 
+			   }
 	
+	
+	
+	ResultSet classnames = st.executeQuery("SELECT methods.classname from methods"); 
+	while(classnames.next()){
+		 classname = classnames.getString("classname"); 
+		   }
+	
+	
+	System.out.println("method id ===============================================================>"+methodid); 
+	System.out.println("classname ===============================================================>"+classname); 
 	for(tracesmethodscallees tc: tracesCalleesList) {
 		
 
