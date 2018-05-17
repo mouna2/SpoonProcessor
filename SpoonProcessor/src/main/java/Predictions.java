@@ -1,3 +1,4 @@
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -6,6 +7,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
+
+import com.mysql.jdbc.FailoverConnectionProxy;
+
+import Tables.TableTraces;
+import Tables.tracesmethodscallees;
+import spoon.Launcher;
+import spoon.SpoonAPI;
+import spoon.reflect.CtModel;
+import spoon.reflect.factory.ClassFactory;
+import spoon.reflect.factory.Factory;
 
 public class Predictions {
 	
@@ -29,7 +41,8 @@ public class Predictions {
 	DBDemo2 dbdemo = new DBDemo2(); 
 	static String methodid=null; 
 	static String classname=null; 
-	
+	Factory factory; 
+	static ClassFactory classFactory; 
 	/**
 	 * Get a new database connection
 	 * 
@@ -42,7 +55,16 @@ public class Predictions {
 		connectionProps.put("root", this.userName);
 		connectionProps.put("123", this.password);
 		conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/databasechess","root","123");
+		SpoonAPI spoon = new Launcher();
+		spoon.addInputResource("C:\\Users\\mouna\\Downloads\\chessgantcode\\workspace_codeBase\\Chess");
+		spoon.getEnvironment().setAutoImports(true);
+		spoon.getEnvironment().setNoClasspath(true);
+		CtModel model = spoon.buildModel();
+		//List<String> classnames= new ArrayList<String>(); 
 
+		// Interact with model
+		 factory= spoon.getFactory();
+		 classFactory = factory.Class();
 		return conn;
 	}
 
@@ -69,8 +91,9 @@ public class Predictions {
 	 * Connect to MySQL and do some stuff.
 	 * @param tracesCalleesList 
 	 * @throws SQLException 
+	 * @throws FileNotFoundException 
 	 */
-	public static void run(List<tracesmethodscallees> tracesCalleesList) throws SQLException {
+	public static void run() throws SQLException, FileNotFoundException {
 		ResultSet rs = null; 
 		// Connect to MySQL
 		Connection conn = null;
@@ -91,13 +114,15 @@ public class Predictions {
 		   }
 	
 	
-	System.out.println("method id ===============================================================>"+methodid); 
-	System.out.println("classname ===============================================================>"+classname); 
+	System.out.println("heyyyyyyyyyyyyyy   method id ===============================================================>"+methodid); 
+	System.out.println("heyyyyyyyyyyyyyyyy  classname ===============================================================>"+classname); 
+	TableTraces tracestable = new TableTraces(); 
+	List<tracesmethodscallees> tracesCalleesList = tracestable.traces(st, classFactory); 
 	for(tracesmethodscallees tc: tracesCalleesList) {
 		
 
-		System.out.println("tc.gold===============================================================>"+tc.gold); 
-		System.out.println("tc.callee===============================================================>"+tc.callee); 
+		System.out.println("tc.goldmmmmmmmmmm===============================================================>"+tc.gold); 
+		System.out.println("tc.calleemmmmmmmmmmm===============================================================>"+tc.callee); 
 		 String query = "update traces set goldprediction = ? where methodid = ? and requirementid = ?";
 	     PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
 	     pstmt.setString(1, tc.gold); // set input parameter 1
@@ -116,11 +141,11 @@ public class Predictions {
 	
 	
 }
-	public static void main (String [] args) throws SQLException {
-		DBDemo2 dbdemo = new DBDemo2(); 
-		List<tracesmethodscallees> TracesCalleesList = dbdemo.TracesCalleesList; 
-		TracesCalleesList = dbdemo.GetList(); 
-		run(TracesCalleesList); 
+	public static void main (String [] args) throws SQLException, FileNotFoundException {
+
+		//DBDemo2 dbdemo = new DBDemo2(); 
+		
+		run(); 
 		
 	}
 	

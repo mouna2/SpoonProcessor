@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,9 +17,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
+import Tables.RequirementClassKey;
+import Tables.fieldmethod;
+import Tables.methodcalls;
+import Tables.methodcallsexecuted;
+import Tables.methods;
+import Tables.tracesmethods;
+import Tables.tracesmethodscallees;
 import spoon.Launcher;
 import spoon.SpoonAPI;
 import spoon.reflect.CtModel;
@@ -1330,7 +1339,6 @@ try {
 						callingmethodsrefinedid = callingmethodsrefined.getString("id"); 
 				
 					}
-
 					//RECALCULATION PHASE: CALLED METHOD ID 
 					 calledmethodsids= st.executeQuery("SELECT methods.id from methods INNER JOIN classes on methods.classname=classes.classname where methods.methodnamerefined='"+MethodTOTransformed+"'and classes.classname='"+ClassTO+"'"); 
 					while(calledmethodsids.next()){
@@ -1568,6 +1576,7 @@ try {
 			  String[] parts = shortmethod.split("[$]", 2);
 			shortmethod=parts[0]; 
 			shortmethod=shortmethod.replaceAll("clinit", "init"); 
+			 shortmethod=ParseLine(line); 
 			System.out.println("HERE IS THIS SHORT METHOD========>"+ shortmethod); 
 	 String goldvalue=null; 
 	 String subjectvalue=null; 
@@ -1653,6 +1662,58 @@ try {
 		e.printStackTrace();
 	}
 	}
+	
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	
+	public String ParseLine(String line) {
+		System.out.println(line);
+		String[] linesplitted = line.split(","); 
+		String method = linesplitted[1]; 
+		String requirement = linesplitted[2]; 
+		String gold = linesplitted[4]; 
+		String subject = linesplitted[5]; 
+		System.out.println("HERE IS THIS SHORT METHOD========>"+ method); 
+		
+		String shortmethod=method.substring(0, method.indexOf("("));
+		String regex = "(.)*(\\d)(.)*";      
+		Pattern pattern = Pattern.compile(regex);
+		boolean containsNumber = pattern.matcher(shortmethod).matches();
+		String[] firstpart;
+		String FinalMethod = null;
+		if(shortmethod.contains("$") && shortmethod.matches(".*\\d+.*")) {
+			 firstpart = shortmethod.split("\\$");
+			String myfirstpart= firstpart[0]; 
+			FinalMethod=myfirstpart; 
+			if(StringUtils.isNumeric(firstpart[1])==false) {
+				String[] secondpart = firstpart[1].split("\\d"); 
+				System.out.println("my first part "+ myfirstpart+ "firstpart"+ firstpart[1]);
+				
+				String mysecondpart=secondpart[1]; 
+				
+				 FinalMethod=myfirstpart+mysecondpart; 
+				System.out.println("FINAL RESULT:    "+FinalMethod);
+			}
+			
+		}
+		
+		else if(shortmethod.contains("$") && containsNumber==false) {
+			 firstpart = shortmethod.split("\\$");
+			
+			System.out.println("FINAL STRING:   "+firstpart[0]);
+			firstpart[1]=firstpart[1].substring(firstpart[1].indexOf("."), firstpart[1].length()); 
+			System.out.println("FINAL STRING:   "+firstpart[1]);
+			 FinalMethod= firstpart[0]+firstpart[1]; 
+			System.out.println("FINAL STRING:   "+FinalMethod);
+		}
+		else {
+			FinalMethod=shortmethod; 
+		}
+		return FinalMethod; 
+	}
+	
+	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	public String transformstring(String s) {

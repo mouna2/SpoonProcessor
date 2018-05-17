@@ -1,3 +1,4 @@
+package Tables;
 import java.util.List;
 
 public class tracesmethods {
@@ -47,4 +48,14 @@ public class tracesmethods {
 		return false;
 		
 	}
+
+	@Override
+	public String toString() {
+		return "tracesmethods [requirement=" + requirement + ", requirementid=" + requirementid + ", fullmethod="
+				+ fullmethod + ", methodid=" + methodid + ", classname=" + classname + ", classid=" + classid
+				+ ", gold=" + gold + ", subject=" + subject + "]";
+	}
+	
+	
+	
 }
