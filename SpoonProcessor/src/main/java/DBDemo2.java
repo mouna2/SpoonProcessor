@@ -102,6 +102,7 @@ public class DBDemo2 {
 	/** The name of the table we are testing with */
 	private final String tableName = "classes";
 	public List<tracesmethodscallees> TracesCalleesList= new ArrayList<tracesmethodscallees>();
+	public List<tracesmethodscallees> TracesCallersList= new ArrayList<tracesmethodscallees>();
 
 	
 	public DBDemo2(List<tracesmethodscallees> tracesCalleesList) {
@@ -370,7 +371,8 @@ public class DBDemo2 {
 		   		"  `classid` LONGTEXT NULL,\r\n" + 
 		   		"  `gold` LONGTEXT NULL,\r\n" + 
 		   		"  `subject` LONGTEXT NULL,\r\n" + 
-		   		"  `goldprediction` LONGTEXT NULL,\r\n" + 
+		   		"  `goldpredictioncallee` LONGTEXT NULL,\r\n" + 
+		   		"  `goldpredictioncaller` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
 		   		"  INDEX `methodid_idx8` (`methodid` ASC),\r\n" + 
 		   		"  CONSTRAINT `methodid8`\r\n" + 
@@ -1441,6 +1443,8 @@ catch (IOException e) {
 String calleeid=null; 
 String goldprediction=null; 
 String calleeidexecuted=null; 
+String callerid=null; 
+String callerexecutedid=null; 
  List<tracesmethods> TraceListMethods= new ArrayList<tracesmethods>();
 tracesmethodscallees tmc = null; 
 try {
@@ -1492,6 +1496,15 @@ try {
 			while(calleesexecuted.next()){
 				 calleeidexecuted = calleesexecuted.getString("calleemethodid"); 
 				   }
+			callerid=null; 
+			ResultSet callersparsed = st.executeQuery("SELECT methodcalls.callermethodid from methodcalls where methodcalls.calleemethodid ='"+methodid+"'"); 
+			while(callersparsed.next()){
+				  callerid = callersparsed.getString("callermethodid"); }
+			callerexecutedid=null; 	   
+			ResultSet callersexecuted = st.executeQuery("SELECT methodcallsexecuted.callermethodid from methodcallsexecuted where methodcallsexecuted.calleemethodid ='"+methodid+"'"); 
+			while(callersexecuted.next()){
+				 callerexecutedid = callersexecuted.getString("callermethodid"); 
+				   }
 	
 		
 		//insert into tracesmethodscallees a new object: if is found in the methodcalls table, then use the value from there 
@@ -1504,11 +1517,23 @@ try {
 				 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, calleeidexecuted); 
 				 TracesCalleesList.add(tmc); 
 			}
+			
+			if(calleeid!=null && requirementid!=null) {
+				 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, callerid); 
+				 TracesCallersList.add(tmc); 
+			}
+			else if(calleeidexecuted!=null) {
+				 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, callerexecutedid); 
+				 TracesCallersList.add(tmc); 
+			}
+			
+			
+			
 		tracesmethods tr= new tracesmethods(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
 		if(methodid!=null && requirementid!=null && classid!=null) {
 			if(tr.contains(TraceListMethods, tr)==false) {
 				  
-				String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`, `goldprediction`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"','" +goldprediction+"')";		
+				String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`, `goldpredictioncallee`, `goldpredictioncaller`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"','" +goldprediction+"','" +goldprediction+"')";		
 				st.executeUpdate(statement);
 				TraceListMethods.add(tr); 
 				
@@ -1541,16 +1566,16 @@ catch (IOException e) {
 /*********************************************************************************************************************************************************************************/	
 /*********************************************************************************************************************************************************************************/   
 //make prediction on the column goldprediction 
-
+int counter=0;
 
 for(tracesmethodscallees tc: TracesCalleesList) {
 	
 
-	System.out.println("tc.gold===============================================================>"+tc.gold); 
+	System.out.println("COUNTER "+counter +"tc.gold===============================================================>"+tc.gold); 
 	System.out.println("tc.callee===============================================================>"+tc.callee); 
 	System.out.println("tc.requirementid===============================================================>"+tc.requirementid+   "------"+tc.callee); 
 
-	 String query = "update traces set goldprediction = ? where methodid = ? and requirementid = ?";
+	 String query = "update traces set goldpredictioncallee = ? where methodid = ? and requirementid = ?";
      PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
      pstmt.setString(1, tc.gold); // set input parameter 1
      pstmt.setString(2, tc.callee); // set input parameter 2
@@ -1561,10 +1586,35 @@ for(tracesmethodscallees tc: TracesCalleesList) {
 	// int goldpredictions = preparedstatement.executeUpdate();
 	// conn.commit();
 	// preparedstatement.close();
-	
+     counter++; 
 	
 	
 }
+
+counter=0;
+for(tracesmethodscallees tc: TracesCallersList) {
+	
+
+	System.out.println("COUNTER "+counter +"tc.gold===============================================================>"+tc.gold); 
+	System.out.println("tc.callee===============================================================>"+tc.callee); 
+	System.out.println("tc.requirementid===============================================================>"+tc.requirementid+   "------"+tc.callee); 
+
+	 String query = "update traces set goldpredictioncaller = ? where methodid = ? and requirementid = ?";
+     PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
+     pstmt.setString(1, tc.gold); // set input parameter 1
+     pstmt.setString(2, tc.callee); // set input parameter 2
+     pstmt.setString(3, tc.requirementid); // set input parameter 3
+     pstmt.executeUpdate(); // execute update statement
+	
+	//PreparedStatement preparedstatement = conn.prepareStatement("update table `databasechess`.`traces` SET `traces`.`goldprediction`='"+tc.gold+"' where `traces`.`methodid`='"+tc.callee+"'"); 
+	// int goldpredictions = preparedstatement.executeUpdate();
+	// conn.commit();
+	// preparedstatement.close();
+	counter++; 
+	
+	
+}
+
 
 	/*********************************************************************************************************************************************************************************/	
 	/*********************************************************************************************************************************************************************************/	
