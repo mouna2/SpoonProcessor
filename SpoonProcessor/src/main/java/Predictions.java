@@ -1,4 +1,7 @@
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -141,7 +144,7 @@ public class Predictions {
 	
 	
 }
-	public static void main (String [] args) throws SQLException, FileNotFoundException {
+	public static void main (String [] args) throws SQLException, ClassNotFoundException, IOException {
 
 		//DBDemo2 dbdemo = new DBDemo2(); 
 		

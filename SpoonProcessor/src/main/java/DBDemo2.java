@@ -2,8 +2,10 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -1455,6 +1457,7 @@ try {
 		  String[] parts = shortmethod.split("[$]", 2);
 		shortmethod=parts[0]; 
 		shortmethod=shortmethod.replaceAll("clinit", "init"); 
+		shortmethod=ParseLine(line); 
 		System.out.println("HERE IS THIS SHORT METHOD========>"+ shortmethod); 
 			ResultSet methodids = st.executeQuery("SELECT methods.id from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
 			while(methodids.next()){
@@ -1520,7 +1523,11 @@ try {
 	}
 	
 	
-
+	String filename= "TracesCalleesList.txt"; 
+	ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
+		oos.writeObject(TracesCalleesList);
+		oos.flush();
+		oos.close();
 }
 catch (IOException e) {
 	// TODO Auto-generated catch block
@@ -1576,7 +1583,9 @@ try {
 			  String[] parts = shortmethod.split("[$]", 2);
 			shortmethod=parts[0]; 
 			shortmethod=shortmethod.replaceAll("clinit", "init"); 
+			
 			 shortmethod=ParseLine(line); 
+			 
 			System.out.println("HERE IS THIS SHORT METHOD========>"+ shortmethod); 
 	 String goldvalue=null; 
 	 String subjectvalue=null; 
