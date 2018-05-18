@@ -27,7 +27,8 @@ public class TableTraces {
 
 		/** The password for the MySQL account (or empty for anonymous) */
 		private final String password = "123";
-
+	
+		
 	public List<tracesmethodscallees> traces(Statement st, ClassFactory classFactory) throws FileNotFoundException, SQLException {
 		connectMethod();
 		File file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Traces.txt");
@@ -39,7 +40,30 @@ public class TableTraces {
 		 String gold=null; 
 		 String subject=null; 
 		
+		  
+		 
+		  
+		/*  
+		  String statement2 = "DELETE FROM `methods` WHERE methodname ='"+"method2"+"'";		
+		  st.executeUpdate(statement2);
+		  
+		  String statement3 = "DELETE FROM `methods` WHERE methodname ='"+"method"+"'";		
+		  st.executeUpdate(statement3);
+		  
+		  String statement4 = "DELETE FROM `methodcalls` WHERE callername ='"+"CALLER"+"'";		
+		  st.executeUpdate(statement4);
+		  
+		 
+		 String statement10 = "ALTER TABLE `methods` AUTO_INCREMENT = 740";		
+		  st.executeUpdate(statement10);
+		  */
+		 String  statement10 = "INSERT INTO `methods`(`methodname`, `methodnamerefined`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+"method"+"','" +"method"+"','" +"method"+"','"  +100+"','"+"mmmm" +"')";		
+		  st.executeUpdate(statement10);
+		  statement10 = "INSERT INTO `methods`(`methodname`, `methodnamerefined`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+"method2"+"','" +"method2"+"','" +"method2"+"','"  +100+"','"+"mmmm" +"')";		
+		  st.executeUpdate(statement10);
 		
+		  statement10 = "INSERT INTO `methodcalls`(`callermethodid`, `callername`, `callerclass`, `calleemethodid`, `calleename`,`calleeclass`) VALUES ('"+741+"','" +"CALLER"+"','" +"CALLER CLASS"+"','" +742+"','" +"CALLEE METH"+"','"+"CALLEE CLASS" +"')";		
+		  st.executeUpdate(statement10);
 		
 		
 		
@@ -49,6 +73,8 @@ public class TableTraces {
 
 		tracesmethodscallees tmc = null; 
 		String line;
+		
+		
 		try {
 			
 			line = bufferedReader.readLine(); 
@@ -124,11 +150,11 @@ public class TableTraces {
 						 TracesCalleesList.add(tmc); 
 					}
 					
-					if(calleeid!=null && requirementid!=null) {
+					if(callerid!=null && requirementid!=null) {
 						 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, callerid); 
 						 TracesCallersList.add(tmc); 
 					}
-					else if(calleeidexecuted!=null) {
+					else if(callerexecutedid!=null) {
 						 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, callerexecutedid); 
 						 TracesCallersList.add(tmc); 
 					}

@@ -3239,3 +3239,5 @@ id,method,requirement,node,gold,subject,tool,category,decision,callerT,callerN,c
 3238,de.java_chess.javaChess.util.UnsynchronizedArrayStack.size()I,R5,leaf,T,T,T,LeafPureSurroundedT,CT,1,0,0,0,0,0
 3239,de.java_chess.javaChess.util.UnsynchronizedArrayStack.size()I,R6,leaf,T,T,T,LeafPureSurroundedT,CT,1,0,0,0,0,0
 3240,de.java_chess.javaChess.util.UnsynchronizedArrayStack.size()I,R7,leaf,N,N,N,LeafPureSurroundedN,CN,0,1,0,0,0,0
+3241,method(),R7,leaf,JJJJJJJJ,JJJJJJJJ,JJJJJJJJ,LeafPureSurroundedN,CN,0,1,0,0,0,0
+3242,method2(),R7,leaf,KKKKKKK,KKKKKKK,KKKKKKK,LeafPureSurroundedN,CN,0,1,0,0,0,0

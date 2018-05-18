@@ -111,7 +111,8 @@ public class Predictions {
 	      int counter=0;
 	      traces.traces(st, classFactory); 
 	      List<tracesmethodscallees> TracesCalleesList = traces.getTracesCalleesList(); 
-
+	    
+		  
 	      for(tracesmethodscallees tc: TracesCalleesList) {
 	      	
 
@@ -163,9 +164,8 @@ public class Predictions {
 		
 		
 	
-		
-		
-		
+	     
+	     
 	}
 	
 	
