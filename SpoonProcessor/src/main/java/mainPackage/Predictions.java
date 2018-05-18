@@ -1,3 +1,4 @@
+package mainPackage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -103,47 +104,72 @@ public class Predictions {
 		Predictions PRED= new Predictions(); 
 		conn = PRED.getConnection();
 		Statement st= conn.createStatement();
-		System.out.println("Connected to database");
-		ResultSet methodids = st.executeQuery("SELECT methods.id from methods"); 
-		while(methodids.next()){
-			 methodid = methodids.getString("id"); 
-			   }
-	
-	
-	
-	ResultSet classnames = st.executeQuery("SELECT methods.classname from methods"); 
-	while(classnames.next()){
-		 classname = classnames.getString("classname"); 
-		   }
-	
-	
-	System.out.println("heyyyyyyyyyyyyyy   method id ===============================================================>"+methodid); 
-	System.out.println("heyyyyyyyyyyyyyyyy  classname ===============================================================>"+classname); 
-	TableTraces tracestable = new TableTraces(); 
-	List<tracesmethodscallees> tracesCalleesList = tracestable.traces(st, classFactory); 
-	for(tracesmethodscallees tc: tracesCalleesList) {
-		
 
-		System.out.println("tc.goldmmmmmmmmmm===============================================================>"+tc.gold); 
-		System.out.println("tc.calleemmmmmmmmmmm===============================================================>"+tc.callee); 
-		 String query = "update traces set goldprediction = ? where methodid = ? and requirementid = ?";
-	     PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
-	     pstmt.setString(1, tc.gold); // set input parameter 1
-	     pstmt.setString(2, tc.callee); // set input parameter 2
-	     pstmt.setString(3, tc.requirementid); // set input parameter 3
-	     pstmt.executeUpdate(); // execute update statement
 		
-		//PreparedStatement preparedstatement = conn.prepareStatement("update table `databasechess`.`traces` SET `traces`.`goldprediction`='"+tc.gold+"' where `traces`.`methodid`='"+tc.callee+"'"); 
-		// int goldpredictions = preparedstatement.executeUpdate();
-		// conn.commit();
-		// preparedstatement.close();
+		System.out.println("Connected to database");
+		TableTraces traces = new TableTraces(); 
+	      int counter=0;
+	      traces.traces(st, classFactory); 
+	      List<tracesmethodscallees> TracesCalleesList = traces.getTracesCalleesList(); 
+
+	      for(tracesmethodscallees tc: TracesCalleesList) {
+	      	
+
+	      	System.out.println("COUNTER "+counter +"tc.gold===============================================================>"+tc.gold); 
+	      	System.out.println("tc.callee===============================================================>"+tc.callee); 
+	      	System.out.println("tc.requirementid===============================================================>"+tc.requirementid+   "------"+tc.callee); 
+
+	      	 String query = "update traces set goldpredictioncallee = ? where methodid = ? and requirementid = ?";
+	           PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
+	           pstmt.setString(1, tc.gold); // set input parameter 1
+	           pstmt.setString(2, tc.callee); // set input parameter 2
+	           pstmt.setString(3, tc.requirementid); // set input parameter 3
+	           pstmt.executeUpdate(); // execute update statement
+	      	
+	      	//PreparedStatement preparedstatement = conn.prepareStatement("update table `databasechess`.`traces` SET `traces`.`goldprediction`='"+tc.gold+"' where `traces`.`methodid`='"+tc.callee+"'"); 
+	      	// int goldpredictions = preparedstatement.executeUpdate();
+	      	// conn.commit();
+	      	// preparedstatement.close();
+	           counter++; 
+	      	
+	      	
+	      }
+
+	      counter=0;
+	      List<tracesmethodscallees> TracesCallersList = traces.getTracesCallersList(); 
+	      for(tracesmethodscallees tc: TracesCallersList) {
+	      	
+
+	      	System.out.println("COUNTER "+counter +"tc.gold===============================================================>"+tc.gold); 
+	      	System.out.println("tc.callee===============================================================>"+tc.callee); 
+	      	System.out.println("tc.requirementid===============================================================>"+tc.requirementid+   "------"+tc.callee); 
+
+	      	 String query = "update traces set goldpredictioncaller = ? where methodid = ? and requirementid = ?";
+	           PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
+	           pstmt.setString(1, tc.gold); // set input parameter 1
+	           pstmt.setString(2, tc.callee); // set input parameter 2
+	           pstmt.setString(3, tc.requirementid); // set input parameter 3
+	           pstmt.executeUpdate(); // execute update statement
+	      	
+	      	//PreparedStatement preparedstatement = conn.prepareStatement("update table `databasechess`.`traces` SET `traces`.`goldprediction`='"+tc.gold+"' where `traces`.`methodid`='"+tc.callee+"'"); 
+	      	// int goldpredictions = preparedstatement.executeUpdate();
+	      	// conn.commit();
+	      	// preparedstatement.close();
+	      	counter++; 
+	      	
+	      	
+	      }
+		
+		
+		
+	
 		
 		
 		
 	}
 	
 	
-}
+
 	public static void main (String [] args) throws SQLException, ClassNotFoundException, IOException {
 
 		//DBDemo2 dbdemo = new DBDemo2(); 

@@ -15,10 +15,8 @@ public class TableSuperClasses {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void superclasses(Statement st, ClassFactory classFactory) throws SQLException {
+	public void superclasses(Statement st, ClassFactory classFactory) throws SQLException {	for(CtType<?> clazz : classFactory.getAll()) {
 		int i=1; 
-
-	for(CtType<?> clazz : classFactory.getAll()) {
 		String childclassQuery = null; 
 		String superclassQuery = null;
 		String superclassQueryName=null; 
@@ -29,7 +27,7 @@ public class TableSuperClasses {
 		
 		
 		//System.out.println("SUPERCLASS"+superclass +"SUBCLASS "+FullClassName);
-	if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(clazz.getPackage().toString()) ) {
+if(clazz.getSuperclass()!=null && clazz.getSuperclass().toString().contains(clazz.getPackage().toString()) ) {
 			
 			String superclass= clazz.getSuperclass().toString();
 		//	System.out.println(i+"    HERE IS MY SUPERCLASS"+superclass+"AND HERE IS MY SUBCLASS  "+FullClassName);
@@ -67,9 +65,8 @@ public class TableSuperClasses {
 		/*	st.executeUpdate("INSERT INTO `superclasses`(`superclass`, `childclass`) VALUES( "
 					+"(("+ superclassQuery+")"
 					+ ", ("+childclassQuery+")));" ); */
-			//clazz.getSuperInterfaces();
-			
+    		//clazz.getSuperInterfaces();
+    		
 		}
-	}
-	}
+	}}
 }

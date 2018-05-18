@@ -16,74 +16,67 @@ import com.mysql.jdbc.StringUtils;
 import spoon.reflect.factory.ClassFactory;
 
 public class TableTracesClasses {
-	public void tracesclasses(Statement st, ClassFactory classFactory) throws SQLException {
-		List<RequirementClassKey> RequirementClassKeys= new ArrayList<RequirementClassKey>(); 
-		int linenum=0; 
-		String FinalMethod=null; 
-		String classid = null;
-		String requirementid = null;
-		String goldvalue=null; 
-		String classname=null; 
-	try {
-			File file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Traces.txt");
-			FileReader fileReader = new FileReader(file);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);	
-			String line = bufferedReader.readLine(); 
-			Hashtable<RequirementClassKey,String> GoldHashTable=new Hashtable<RequirementClassKey,String>();  
-			Hashtable<RequirementClassKey,String> SubjectHashTable=new Hashtable<RequirementClassKey,String>();  
-		
-			while ((line = bufferedReader.readLine()) != null) {
-				FinalMethod=ParseLine(line); 
-		
-				String[] linesplitted = line.split(","); 
-				String method = linesplitted[1]; 
-				String requirement = linesplitted[2]; 
-				String gold = linesplitted[4]; 
-				String subject = linesplitted[5]; 
+	public void tracesclasses(Statement st, ClassFactory classFactory) throws SQLException {List<RequirementClassKey> RequirementClassKeys= new ArrayList<RequirementClassKey>(); 
+	
+try {
+		File file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Traces.txt");
+		FileReader fileReader = new FileReader(file);
+		BufferedReader bufferedReader = new BufferedReader(fileReader);	
+		String line = bufferedReader.readLine(); 
+		Hashtable<RequirementClassKey,String> GoldHashTable=new Hashtable<RequirementClassKey,String>();  
+		Hashtable<RequirementClassKey,String> SubjectHashTable=new Hashtable<RequirementClassKey,String>();  
+		while ((line = bufferedReader.readLine()) != null) {
+			System.out.println(line);
+			String[] linesplitted = line.split(","); 
+			String method = linesplitted[1]; 
+			String requirement = linesplitted[2]; 
+			String gold = linesplitted[4]; 
+			String subject = linesplitted[5]; 
+			String shortmethod=method.substring(0, method.indexOf("(")); 
+			  String[] parts = shortmethod.split("[$]", 2);
+			shortmethod=parts[0]; 
+			shortmethod=shortmethod.replaceAll("clinit", "init"); 
 			
+			 shortmethod=ParseLine(line); 
+			 
+			System.out.println("HERE IS THIS SHORT METHOD========>"+ shortmethod); 
+	 String goldvalue=null; 
+	 String subjectvalue=null; 
 		
-		
-				System.out.println("FINAL METHOD IS HERE :   "+FinalMethod);
-		ResultSet classnames = st.executeQuery("SELECT methods.classname from methods where methods.methodabbreviation ='"+FinalMethod+"'"); 
-		
-
-		while(classnames.next()){
-			classname = classnames.getString("classname"); 
+	
+	
+	String classname = null; 
+	ResultSet classnames = st.executeQuery("SELECT methods.classname from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+	while(classnames.next()){
+		classname = classnames.getString("classname"); 
+		   }
+	String classid=null; 
+	ResultSet classids = st.executeQuery("SELECT methods.classid from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
+	while(classids.next()){
+		classid = classids.getString("classid"); 
+		   }
+	
+	String requirementid=null; 
+	ResultSet requirements = st.executeQuery("SELECT requirements.id from requirements where requirements.requirementname ='"+requirement+"'"); 
+	while(requirements.next()){
+		requirementid = requirements.getString("id"); 
+		   }	
+	 
+	 goldvalue=null; 
+	ResultSet goldvalues = st.executeQuery("SELECT traces.gold from traces where traces.requirementid ='"+requirementid+"' and traces.classid='"+classid+"'"); 
+	 while(goldvalues.next()){
+			goldvalue = goldvalues.getString("gold"); 
+			   }
+	  subjectvalue=null; 
+		ResultSet subjectvalues = st.executeQuery("SELECT traces.subject from traces where traces.requirementid ='"+requirementid+"' and traces.classid='"+classid+"'"); 
+		while(subjectvalues.next()){
+			subjectvalue = subjectvalues.getString("subject"); 
 			   }
 		
-		ResultSet classids = st.executeQuery("SELECT methods.classid from methods where methods.methodabbreviation ='"+FinalMethod+"'"); 
-		
-		while(classids.next()){
-			classid = classids.getString("classid"); 
-			   }
-		
-		
-		ResultSet requirements = st.executeQuery("SELECT requirements.id from requirements where requirements.requirementname ='"+requirement+"'"); 
-		
-
-		while(requirements.next()){
-			requirementid = requirements.getString("id"); 
-			   }	
-		 
-		 
-		ResultSet goldvalues = st.executeQuery("SELECT traces.gold from traces where traces.requirementid ='"+requirementid+"' and traces.classid='"+classid+"'"); 
-		 while(goldvalues.next()){
-				goldvalue = goldvalues.getString("gold"); 
-				   }
-		 String subjectvalue=null; 
-			ResultSet subjectvalues = st.executeQuery("SELECT traces.subject from traces where traces.requirementid ='"+requirementid+"' and traces.classid='"+classid+"'"); 
-			while(subjectvalues.next()){
-				subjectvalue = subjectvalues.getString("subject"); 
-				   }
-			
-			//GoldSubjectValues goldsubject= new GoldSubjectValues(goldvalue, subjectvalue); 
-			if(requirement!=null && classid!=null) {
-				
-			}
+		//GoldSubjectValues goldsubject= new GoldSubjectValues(goldvalue, subjectvalue); 
+		if(requirementid!=null && classid!=null ) {
 			RequirementClassKey RequirementClassKey= new RequirementClassKey(requirementid, requirement, classid, classname, goldvalue, subjectvalue); 
 			if(GoldHashTable.containsKey(RequirementClassKey)==false) {
-				System.out.println("====================================="+linenum+"  "+requirementid+""+requirement+""+ classid+""+classname+""+goldvalue+""+subjectvalue); 
-				linenum++; 
 				GoldHashTable.put(RequirementClassKey, goldvalue); 
 			}
 			else if((GoldHashTable.get(RequirementClassKey).equals("T")==false) &&( RequirementClassKey.getGoldflag().equals("T")==false)  ) {
@@ -94,6 +87,7 @@ public class TableTracesClasses {
 				GoldHashTable.put(RequirementClassKey, goldvalue); 
 				RequirementClassKey.setGoldflag(goldvalue); 
 			}
+			
 			if(SubjectHashTable.containsKey(RequirementClassKey)==false) {
 				SubjectHashTable.put(RequirementClassKey, subjectvalue); 
 			}
@@ -105,33 +99,36 @@ public class TableTracesClasses {
 				SubjectHashTable.put(RequirementClassKey, subjectvalue); 
 				RequirementClassKey.setSubjectflag(subjectvalue); 
 			}
-			
-		 
-		
 			if(RequirementClassKey.contains(RequirementClassKeys, RequirementClassKey)==false) {
 				String statement2= "INSERT INTO `tracesclasses`(`requirement`, `requirementid`,  `classname`, `classid`, `gold`,  `subject`) VALUES ('"+requirement+"','" +requirementid+"','"  +classname+"','" +classid+"','"+GoldHashTable.get(RequirementClassKey) +"','" +SubjectHashTable.get(RequirementClassKey)+"')";	
 				st.executeUpdate(statement2); 
 				RequirementClassKeys.add(RequirementClassKey); 
 			}
 		
-		
-
 			
-		
-
-
-
-			}
-		
-		
-		
-		
 		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
 		
+	 
+	
+		
+	
+
+		
+	
+
+
+
+		}
+	
+	
+	
+	
+	}
+	catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 	public String ParseLine(String line) {

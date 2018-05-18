@@ -1,3 +1,4 @@
+package mainPackage;
 
 public class GoldSubjectValues {
 	String gold; 

@@ -1,3 +1,4 @@
+package mainPackage;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1552,11 +1553,11 @@ try {
 	}
 	
 	
-	String filename= "TracesCalleesList.txt"; 
+	/*String filename= "TracesCalleesList.txt"; 
 	ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
 		oos.writeObject(TracesCalleesList);
 		oos.flush();
-		oos.close();
+		oos.close();*/
 }
 catch (IOException e) {
 	// TODO Auto-generated catch block
@@ -1619,6 +1620,8 @@ for(tracesmethodscallees tc: TracesCallersList) {
 	/*********************************************************************************************************************************************************************************/	
 	/*********************************************************************************************************************************************************************************/	
 	/*********************************************************************************************************************************************************************************/   
+//BUILD TABLE FOR TRACES CLASSES 
+
 List<RequirementClassKey> RequirementClassKeys= new ArrayList<RequirementClassKey>(); 
 	
 try {

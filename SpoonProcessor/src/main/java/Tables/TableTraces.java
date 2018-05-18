@@ -4,18 +4,32 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
+import mainPackage.*;
 import spoon.reflect.factory.ClassFactory;
 
 public class TableTraces {
-	 List<tracesmethods> TraceListMethods= new ArrayList<tracesmethods>();
+	
+	List<tracesmethods> TraceListMethods= new ArrayList<tracesmethods>();
+	
+	 List<tracesmethodscallees> TracesCalleesList= new ArrayList<tracesmethodscallees>();
+	 List<tracesmethodscallees> TracesCallersList= new ArrayList<tracesmethodscallees>();
+
+	 private final String userName = "root";
+
+		/** The password for the MySQL account (or empty for anonymous) */
+		private final String password = "123";
 
 	public List<tracesmethodscallees> traces(Statement st, ClassFactory classFactory) throws FileNotFoundException, SQLException {
+		connectMethod();
 		File file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Traces.txt");
 		 FileReader fileReader = new FileReader(file);
 		 BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -31,7 +45,8 @@ public class TableTraces {
 		
 		String goldprediction=null; 
 		String calleeidexecuted=null; 
-		List<tracesmethodscallees> TracesCalleesList= new ArrayList<tracesmethodscallees>();
+		
+
 		tracesmethodscallees tmc = null; 
 		String line;
 		try {
@@ -59,10 +74,10 @@ public class TableTraces {
 						methodid = methodids.getString("id"); 
 						   }
 				
-				
+					String classname=null; 
 				
 				ResultSet classnames = st.executeQuery("SELECT methods.classname from methods where methods.methodabbreviation ='"+shortmethod+"'"); 
-				String classname=null; 
+				
 				while(classnames.next()){
 					classname = classnames.getString("classname"); 
 					   }
@@ -78,22 +93,29 @@ public class TableTraces {
 					   }
 				// Rule: if method A calls method B and method A implements requirement X, then I can just assume that method B implements requirement X as well 
 				// Retrieving the calleeid
-					String calleeid=null; 
+				String calleeid = null; 
 					ResultSet calleesparsed = st.executeQuery("SELECT methodcalls.calleemethodid from methodcalls where methodcalls.callermethodid ='"+methodid+"'"); 
 					while(calleesparsed.next()){
-						 calleeid = calleesparsed.getString("calleemethodid"); 
-						   }
-					 calleeidexecuted=null; 
+						 calleeid = calleesparsed.getString("calleemethodid"); }
+					calleeidexecuted=null; 	   
 					ResultSet calleesexecuted = st.executeQuery("SELECT methodcallsexecuted.calleemethodid from methodcallsexecuted where methodcallsexecuted.callermethodid ='"+methodid+"'"); 
 					while(calleesexecuted.next()){
 						 calleeidexecuted = calleesexecuted.getString("calleemethodid"); 
 						   }
-				
+					String	callerid=null; 
+					ResultSet callersparsed = st.executeQuery("SELECT methodcalls.callermethodid from methodcalls where methodcalls.calleemethodid ='"+methodid+"'"); 
+					while(callersparsed.next()){
+						  callerid = callersparsed.getString("callermethodid"); }
+					String	callerexecutedid=null; 	   
+					ResultSet callersexecuted = st.executeQuery("SELECT methodcallsexecuted.callermethodid from methodcallsexecuted where methodcallsexecuted.calleemethodid ='"+methodid+"'"); 
+					while(callersexecuted.next()){
+						 callerexecutedid = callersexecuted.getString("callermethodid"); 
+						   }
+			
 				
 				//insert into tracesmethodscallees a new object: if is found in the methodcalls table, then use the value from there 
 				//otherwise, use the value from the methodcallsexecuted table 
-					
-					if(calleeid!=null) {
+					if(calleeid!=null && requirementid!=null) {
 						 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, calleeid); 
 						 TracesCalleesList.add(tmc); 
 					}
@@ -101,12 +123,23 @@ public class TableTraces {
 						 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, calleeidexecuted); 
 						 TracesCalleesList.add(tmc); 
 					}
+					
+					if(calleeid!=null && requirementid!=null) {
+						 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, callerid); 
+						 TracesCallersList.add(tmc); 
+					}
+					else if(calleeidexecuted!=null) {
+						 tmc= new tracesmethodscallees(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject, callerexecutedid); 
+						 TracesCallersList.add(tmc); 
+					}
+					
+					
+					
 				tracesmethods tr= new tracesmethods(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
-				//System.out.println("====================="+requirementid+ "   "+ requirement +"    "+ shortmethod+ "           "+ methodid +"   "+ classname +"    "+classid+"   "+gold+ "   "+subject);
-				if(methodid!=null) {
-					if(tr.contains(TraceListMethods, tr)==false ) {
+				if(methodid!=null && requirementid!=null && classid!=null) {
+					if(tr.contains(TraceListMethods, tr)==false) {
 						  
-						String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`, `goldprediction`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"','" +goldprediction+"')";		
+						String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`, `goldpredictioncallee`, `goldpredictioncaller`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"','" +goldprediction+"','" +goldprediction+"')";		
 						st.executeUpdate(statement);
 						TraceListMethods.add(tr); 
 						
@@ -125,13 +158,91 @@ public class TableTraces {
 			}
 			
 			
-
+				
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		setTracesCallersList(TracesCallersList);
+		setTracesCalleesList(TracesCalleesList);
 		return TracesCalleesList;
 		
 	}
+	public List<tracesmethods> getTraceListMethods() {
+		return TraceListMethods;
+	}
+	public void setTraceListMethods(List<tracesmethods> traceListMethods) {
+		TraceListMethods = traceListMethods;
+	}
+	public List<tracesmethodscallees> getTracesCalleesList() {
+		return TracesCalleesList;
+	}
+	public void setTracesCalleesList(List<tracesmethodscallees> tracesCalleesList) {
+		TracesCalleesList = tracesCalleesList;
+	}
+	public List<tracesmethodscallees> getTracesCallersList() {
+		return TracesCallersList;
+	}
+	public void setTracesCallersList(List<tracesmethodscallees> tracesCallersList) {
+		TracesCallersList = tracesCallersList;
+	}
+	public TableTraces() {
+		super();
+	}
+	
+	
+	
+	
+
+
+
+
+
+
+public void connectMethod () throws SQLException {
+	ResultSet rs = null; 
+	// Connect to MySQL
+	Connection conn = getConnection();
+	DBDemo1 dbdemo = new DBDemo1(); 
+	dbdemo.getConnection(); 
+	Statement st= conn.createStatement();
+
+	st.executeUpdate("DROP TABLE IF EXISTS traces"); 
+	System.out.println("Connected to database");
+	
+	   st.executeUpdate("CREATE TABLE `databasechess`.`traces` (\r\n" + 
+		   		"  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\r\n" + 
+		   		"  `requirement` LONGTEXT NULL,\r\n" + 
+		   		"  `requirementid` INT,\r\n" + 
+		   		"  `method` LONGTEXT NULL,\r\n" + 
+		   		"  `fullmethod` LONGTEXT NULL,\r\n" +
+		   		"  `methodid` INT NULL,\r\n" + 
+		   		"  `classname` LONGTEXT NULL,\r\n" + 
+		   		"  `classid` LONGTEXT NULL,\r\n" + 
+		   		"  `gold` LONGTEXT NULL,\r\n" + 
+		   		"  `subject` LONGTEXT NULL,\r\n" + 
+		   		"  `goldpredictioncallee` LONGTEXT NULL,\r\n" + 
+		   		"  `goldpredictioncaller` LONGTEXT NULL,\r\n" + 
+		   		"  PRIMARY KEY (`id`),\r\n" + 
+		   		"  INDEX `methodid_idx8` (`methodid` ASC),\r\n" + 
+		   		"  CONSTRAINT `methodid8`\r\n" + 
+		   		"    FOREIGN KEY (`methodid`)\r\n" + 
+		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
+		   		"    ON DELETE NO ACTION\r\n" + 
+		   		"    ON UPDATE NO ACTION);\r\n" + 	
+		   		""); 
+		 
+}
+
+
+public Connection getConnection() throws SQLException {
+	Connection conn = null;
+	Properties connectionProps = new Properties();
+	connectionProps.put("root", this.userName);
+	connectionProps.put("123", this.password);
+	conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/databasechess","root","123");
+
+	return conn;
+}
 }

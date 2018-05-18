@@ -17,14 +17,15 @@ public class TableInterfaces {
 	}
 
 	public void interfaces( Statement st, ClassFactory classFactory) throws SQLException {
-		for(CtType<?> clazz : classFactory.getAll()) {
-			
-			
-			String myinterfaceclassid = null;
-			String myinterfacename = null;
-			String myclassid = null;
-			String myclassname = null;
-			
+		
+   	for(CtType<?> clazz : classFactory.getAll()) {
+    		
+    		
+    		String myinterfaceclassid = null;
+    		String myinterfacename = null;
+    		String myclassid = null;
+    		String myclassname = null;
+    		
 			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
 			Set<CtTypeReference<?>> interfaces = clazz.getSuperInterfaces(); 
 			
@@ -55,13 +56,14 @@ public class TableInterfaces {
 				//		System.out.println("class referenced: "+myclass);	
 			   		   }
 					
-					st.executeUpdate("INSERT INTO `interfaces`(`interfaceclassid`,`interfacename`,`ownerclassid`, `classname`) VALUES ('"+myinterfaceclassid +"','" +myinterfacename+"','" +myclassid+"','" +myclassname+"')");
+	    			st.executeUpdate("INSERT INTO `interfaces`(`interfaceclassid`,`interfacename`,`ownerclassid`, `classname`) VALUES ('"+myinterfaceclassid +"','" +myinterfacename+"','" +myclassid+"','" +myclassname+"')");
 				}
 				
 			}
 			
 
-		}
-
+    	}
+		
+		
 	}
 }

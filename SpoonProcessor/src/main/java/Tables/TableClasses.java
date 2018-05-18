@@ -20,31 +20,31 @@ public class TableClasses {
 	}
 
 	public void Classes(Statement st, ClassFactory classFactory) throws SQLException {
-		for(CtType<?> clazz : classFactory.getAll()) {
-			
-	    	
-			
+for(CtType<?> clazz : classFactory.getAll()) {
+    		
+    	
+    		
 			
 			String FullClassName= clazz.getPackage()+"."+clazz.getSimpleName(); 
 			st.executeUpdate("INSERT INTO `classes`(`classname`) VALUES ('"+FullClassName+"');");
 		
 			 ResultSet rs = st.executeQuery("SELECT * FROM classes"); 
-			   while(rs.next()){
-				   //System.out.println(rs.getString("classname"));
-			   }			
-			
-			
-					
-		
-
-			
-			
-			 for(CtField<?> field : clazz.getFields()) {
-					for(CtMethod<?> method :clazz.getMethods()) {
-		    			// method.getParameters()
-		    			method.<CtFieldAccess<?>>getElements(new FieldAccessFilter(field.getReference()));
-		    		}
-			 }
-		}
+   		   while(rs.next()){
+   			   //System.out.println(rs.getString("classname"));
+   		   }			
+   		
+    		
+    				
+    	
+   
+    		
+  		
+    		 for(CtField<?> field : clazz.getFields()) {
+    				for(CtMethod<?> method :clazz.getMethods()) {
+    	    			// method.getParameters()
+    	    			method.<CtFieldAccess<?>>getElements(new FieldAccessFilter(field.getReference()));
+    	    		}
+    		 }
+    	}
 	}
 }

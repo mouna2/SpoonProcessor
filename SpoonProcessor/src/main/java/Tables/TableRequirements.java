@@ -12,39 +12,38 @@ import spoon.reflect.factory.ClassFactory;
 public class TableRequirements {
 
 	public void requirements(Statement st, ClassFactory classFactory) throws FileNotFoundException, SQLException {
-		// TODO Auto-generated method stub
+		
 		File file = new File("C:\\Users\\mouna\\git\\SpoonProcessor\\Requirements.txt");
-		 FileReader fileReader = new FileReader(file);
-		 BufferedReader bufferedReader = new BufferedReader(fileReader);
-		 StringBuffer stringBuffer = new StringBuffer();
+	 FileReader fileReader = new FileReader(file);
+	 BufferedReader bufferedReader = new BufferedReader(fileReader);
+	 StringBuffer stringBuffer = new StringBuffer();
 
-		 
+	 
+	try {
+		
+
 		String line;
-		try {
+		while ((line = bufferedReader.readLine()) != null) {
+			System.out.println(line);
 			
-
-			while ((line = bufferedReader.readLine()) != null) {
-				System.out.println(line);
-				
-				
-				
 			
-				
-				String statement = "INSERT INTO `requirements`(`requirementname`) VALUES ('"+line+"')";		
-				st.executeUpdate(statement);
 			
-				
-				
-			}
-
-
-
-
-			}
+		
 			
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			String statement = "INSERT INTO `requirements`(`requirementname`) VALUES ('"+line+"')";		
+			st.executeUpdate(statement);
+		
+			
+			
 		}
-	}
+
+
+
+
+		}
+		
+	catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}}
 }
