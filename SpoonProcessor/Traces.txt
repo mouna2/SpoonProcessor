@@ -3239,7 +3239,7 @@ id,method,requirement,node,gold,subject,tool,category,decision,callerT,callerN,c
 3238,de.java_chess.javaChess.util.UnsynchronizedArrayStack.size()I,R5,leaf,T,T,T,LeafPureSurroundedT,CT,1,0,0,0,0,0
 3239,de.java_chess.javaChess.util.UnsynchronizedArrayStack.size()I,R6,leaf,T,T,T,LeafPureSurroundedT,CT,1,0,0,0,0,0
 3240,de.java_chess.javaChess.util.UnsynchronizedArrayStack.size()I,R7,leaf,N,N,N,LeafPureSurroundedN,CN,0,1,0,0,0,0
-3241,method(),R7,leaf,JJJJJJJJ,JJJJJJJJ,JJJJJJJJ,LeafPureSurroundedN,CN,0,1,0,0,0,0
-3242,method2(),R7,leaf,KKKKKKK,KKKKKKK,KKKKKKK,LeafPureSurroundedN,CN,0,1,0,0,0,0
-3243,method3(),R7,leaf,MMMMMMM,MMMMMM,MMMMM,LeafPureSurroundedN,CN,0,1,0,0,0,0
-3244,method4(),R7,leaf,XXXXXXXXX,XXXXXXXXX,XXXXXXXX,LeafPureSurroundedN,CN,0,1,0,0,0,0
+3241,method(),R7,leaf,741,741,741,LeafPureSurroundedN,CN,0,1,0,0,0,0
+3242,method2(),R7,leaf,742,742,742,LeafPureSurroundedN,CN,0,1,0,0,0,0
+3243,method3(),R7,leaf,743,743,743,LeafPureSurroundedN,CN,0,1,0,0,0,0
+3244,method4(),R7,leaf,744,744,744,LeafPureSurroundedN,CN,0,1,0,0,0,0

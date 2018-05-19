@@ -119,11 +119,20 @@ public class Predictions {
 	      	System.out.println("COUNTER "+counter +"tc.gold===============================================================>"+tc.gold); 
 	      	System.out.println("tc.callee===============================================================>"+tc.callee); 
 	      	System.out.println("tc.requirementid===============================================================>"+tc.requirementid+   "------"+tc.callee); 
-
+	    
+	      	
+	      	String goldvaluepredicted = null; 
+			ResultSet mygoldvalues = st.executeQuery("SELECT traces.gold from traces where traces.methodid ='"+tc.callee+"'"); 
+			while(mygoldvalues.next()){
+				goldvaluepredicted = mygoldvalues.getString("gold"); }
+	      	
+	      	
+	      	
 	      	 String query = "update traces set goldpredictioncallee = ? where methodid = ? and requirementid = ?";
 	           PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
-	           pstmt.setString(1, tc.gold); // set input parameter 1
-	           pstmt.setString(2, tc.callee); // set input parameter 2
+	        
+	           pstmt.setString(1, goldvaluepredicted); // set input parameter 1
+	           pstmt.setString(2, tc.methodid); // set input parameter 2
 	           pstmt.setString(3, tc.requirementid); // set input parameter 3
 	           pstmt.executeUpdate(); // execute update statement
 	      	
@@ -142,13 +151,21 @@ public class Predictions {
 	      	
 
 	      	System.out.println("COUNTER "+counter +"tc.gold===============================================================>"+tc.gold); 
-	      	System.out.println("tc.callee===============================================================>"+tc.callee); 
+	      	System.out.println("tc.callee===============================================================>"+tc.methodid); 
 	      	System.out.println("tc.requirementid===============================================================>"+tc.requirementid+   "------"+tc.callee); 
 
+	    	String goldvaluepredicted = null; 
+			ResultSet mygoldvalues = st.executeQuery("SELECT traces.gold from traces where traces.methodid ='"+tc.callee+"'"); 
+			while(mygoldvalues.next()){
+				goldvaluepredicted = mygoldvalues.getString("gold"); }
+	      	
+	      	
 	      	 String query = "update traces set goldpredictioncaller = ? where methodid = ? and requirementid = ?";
 	           PreparedStatement pstmt = conn.prepareStatement(query); // create a statement
-	           pstmt.setString(1, tc.gold); // set input parameter 1
-	           pstmt.setString(2, tc.callee); // set input parameter 2
+	         
+	           pstmt.setString(1, goldvaluepredicted); // set input parameter 1
+	          // pstmt.setString(1, tc.gold); // set input parameter 1
+	           pstmt.setString(2, tc.methodid); // set input parameter 2
 	           pstmt.setString(3, tc.requirementid); // set input parameter 3
 	           pstmt.executeUpdate(); // execute update statement
 	      	
