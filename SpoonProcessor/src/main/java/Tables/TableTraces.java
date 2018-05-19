@@ -22,7 +22,12 @@ public class TableTraces {
 	
 	 List<tracesmethodscallees> TracesCalleesList= new ArrayList<tracesmethodscallees>();
 	 List<tracesmethodscallees> TracesCallersList= new ArrayList<tracesmethodscallees>();
+		
+		String goldprediction=null; 
+		String calleeidexecuted=null; 
+		
 
+		tracesmethodscallees tmc = null; 
 	 private final String userName = "root";
 
 		/** The password for the MySQL account (or empty for anonymous) */
@@ -43,37 +48,48 @@ public class TableTraces {
 		  
 		 
 		  
+		
+		  
 		 String statement4 = "DELETE FROM `methodcalls` WHERE callername ='"+"CALLER"+"'";		
 		  st.executeUpdate(statement4);
-		  
+		
+		  statement4 = "DELETE FROM `methodcalls` WHERE callername ='"+"CALLER2"+"'";		
+		  st.executeUpdate(statement4);
+		
 		  
 		  String statement2 = "DELETE FROM `methods` WHERE id ='"+"741"+"'";		
-		  st.executeUpdate(statement2);
-		  
+		  st.executeUpdate(statement2);	  
 		  String statement3 = "DELETE FROM `methods` WHERE id ='"+"742"+"'";		
+		  st.executeUpdate(statement3);
+		  statement3 = "DELETE FROM `methods` WHERE id ='"+"743"+"'";		
+		  st.executeUpdate(statement3);
+		  statement3 = "DELETE FROM `methods` WHERE id ='"+"744"+"'";		
 		  st.executeUpdate(statement3);
 		  
 		 
+		String  statement10 = "ALTER TABLE `methods` AUTO_INCREMENT = 740";		
+		 st.executeUpdate(statement10);
 		  
-		 
-		 String statement10 = "ALTER TABLE `methods` AUTO_INCREMENT = 740";		
-		  st.executeUpdate(statement10);
+		  statement10 = "ALTER TABLE `methodcalls` AUTO_INCREMENT = 404";		
+			 st.executeUpdate(statement10);
 		  
 		   statement10 = "INSERT INTO `methods`(`methodname`, `methodnamerefined`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+"method"+"','" +"method"+"','" +"method"+"','"  +100+"','"+"mmmm" +"')";		
 		  st.executeUpdate(statement10);
 		  statement10 = "INSERT INTO `methods`(`methodname`, `methodnamerefined`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+"method2"+"','" +"method2"+"','" +"method2"+"','"  +100+"','"+"mmmm" +"')";		
 		  st.executeUpdate(statement10);
+		  
+		  statement10 = "INSERT INTO `methods`(`methodname`, `methodnamerefined`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+"method3"+"','" +"method3"+"','" +"method3"+"','"  +100+"','"+"mmmm" +"')";		
+		  st.executeUpdate(statement10);
+		  statement10 = "INSERT INTO `methods`(`methodname`, `methodnamerefined`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+"method4"+"','" +"method4"+"','" +"method4"+"','"  +100+"','"+"mmmm" +"')";		
+		  st.executeUpdate(statement10);
 		
 		  statement10 = "INSERT INTO `methodcalls`(`callermethodid`, `callername`, `callerclass`, `calleemethodid`, `calleename`,`calleeclass`) VALUES ('"+741+"','" +"CALLER"+"','" +"CALLER CLASS"+"','" +742+"','" +"CALLEE METH"+"','"+"CALLEE CLASS" +"')";		
 		  st.executeUpdate(statement10);
-		
-		
-		
-		String goldprediction=null; 
-		String calleeidexecuted=null; 
-		
+		  statement10 = "INSERT INTO `methodcalls`(`callermethodid`, `callername`, `callerclass`, `calleemethodid`, `calleename`,`calleeclass`) VALUES ('"+743+"','" +"CALLER"+"','" +"CALLER CLASS"+"','" +742+"','" +"CALLEE METH"+"','"+"CALLEE CLASS" +"')";		
+		  st.executeUpdate(statement10);
+		  statement10 = "INSERT INTO `methodcalls`(`callermethodid`, `callername`, `callerclass`, `calleemethodid`, `calleename`,`calleeclass`) VALUES ('"+744+"','" +"CALLER2"+"','" +"CALLER CLASS"+"','" +742+"','" +"CALLEE METH"+"','"+"CALLEE CLASS" +"')";		
+		  st.executeUpdate(statement10);
 
-		tracesmethodscallees tmc = null; 
 		String line;
 		
 		
@@ -164,7 +180,8 @@ public class TableTraces {
 					
 					
 				tracesmethods tr= new tracesmethods(requirement, requirementid, shortmethod, methodid, classname, classid, gold, subject); 
-				if(methodid!=null && requirementid!=null && classid!=null) {
+				if(methodid!=null && requirementid!=null ) {
+				//if(methodid!=null && requirementid!=null && classid!=null) {
 					if(tr.contains(TraceListMethods, tr)==false) {
 						  
 						String statement = "INSERT INTO `traces`(`requirement`, `requirementid`, `method`, `fullmethod`, `methodid`,`classname`, `classid`, `gold`,  `subject`, `goldpredictioncallee`, `goldpredictioncaller`) VALUES ('"+requirement+"','" +requirementid+"','" +shortmethod+"','" +method+"','" +methodid+"','"+classname +"','" +classid+"','"+gold +"','" +subject+"','" +goldprediction+"','" +goldprediction+"')";		
@@ -253,12 +270,14 @@ public void connectMethod () throws SQLException {
 		   		"  `goldpredictioncallee` LONGTEXT NULL,\r\n" + 
 		   		"  `goldpredictioncaller` LONGTEXT NULL,\r\n" + 
 		   		"  PRIMARY KEY (`id`),\r\n" + 
-		   		"  INDEX `methodid_idx8` (`methodid` ASC),\r\n" + 
+		   		"  INDEX `methodid_idx8` (`methodid` ASC)"+
+		   		 ",\r\n" + 
 		   		"  CONSTRAINT `methodid8`\r\n" + 
 		   		"    FOREIGN KEY (`methodid`)\r\n" + 
 		   		"    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
 		   		"    ON DELETE NO ACTION\r\n" + 
-		   		"    ON UPDATE NO ACTION);\r\n" + 	
+		   		"    ON UPDATE NO ACTION"+
+		   		 ");\r\n" + 	
 		   		""); 
 		 
 }

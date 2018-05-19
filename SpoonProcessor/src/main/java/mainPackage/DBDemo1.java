@@ -241,12 +241,14 @@ public class DBDemo1 {
            "  `classname` LONGTEXT NULL,\r\n" + 
            "  PRIMARY KEY (`id`),\r\n" + 
            "  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
-           "  INDEX `classid_idx` (`classid` ASC),\r\n" + 
+           "  INDEX `classid_idx` (`classid` ASC)"
+          + ",\r\n" + 
            "  CONSTRAINT `classid2`\r\n" + 
            "    FOREIGN KEY (`classid`)\r\n" + 
            "    REFERENCES `databasechess`.`classes` (`id`)\r\n" + 
            "    ON DELETE NO ACTION\r\n" + 
-           "    ON UPDATE NO ACTION);"); 
+           "    ON UPDATE NO ACTION"
+           + ");"); 
        st.executeUpdate("CREATE TABLE `databasechess`.`parameters` (\r\n" + 
            "  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
            "  `parametername` VARCHAR(200) NULL,\r\n" + 
@@ -343,7 +345,7 @@ public class DBDemo1 {
            "  UNIQUE INDEX `id_UNIQUE` (`id` ASC),\r\n" + 
            "  INDEX `caller_idx` (`callermethodid` ASC),\r\n" + 
            "  INDEX `callee_idx` (`calleemethodid` ASC),\r\n" + 
-           "  CONSTRAINT `methodcalledid`\r\n" + 
+          "  CONSTRAINT `methodcalledid`\r\n" + 
            "    FOREIGN KEY (`callermethodid`)\r\n" + 
            "    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
            "    ON DELETE NO ACTION\r\n" + 
@@ -352,7 +354,8 @@ public class DBDemo1 {
            "    FOREIGN KEY (`calleemethodid`)\r\n" + 
            "    REFERENCES `databasechess`.`methods` (`id`)\r\n" + 
            "    ON DELETE NO ACTION\r\n" + 
-           "    ON UPDATE NO ACTION);"); 
+           "    ON UPDATE NO ACTION"+
+            ");"); 
        st.executeUpdate("CREATE TABLE `databasechess`.`methodcallsexecuted` (\r\n" + 
              "  `id` INT NOT NULL AUTO_INCREMENT,\r\n" + 
              "  `callermethodid` LONGTEXT NULL,\r\n" + 

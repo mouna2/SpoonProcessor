@@ -115,7 +115,7 @@ public class Predictions {
 		  
 	      for(tracesmethodscallees tc: TracesCalleesList) {
 	      	
-
+	    	String last=tc.gold;   
 	      	System.out.println("COUNTER "+counter +"tc.gold===============================================================>"+tc.gold); 
 	      	System.out.println("tc.callee===============================================================>"+tc.callee); 
 	      	System.out.println("tc.requirementid===============================================================>"+tc.requirementid+   "------"+tc.callee); 
