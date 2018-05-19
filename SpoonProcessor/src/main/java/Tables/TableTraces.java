@@ -43,21 +43,23 @@ public class TableTraces {
 		  
 		 
 		  
-		/*  
-		  String statement2 = "DELETE FROM `methods` WHERE methodname ='"+"method2"+"'";		
+		 String statement4 = "DELETE FROM `methodcalls` WHERE callername ='"+"CALLER"+"'";		
+		  st.executeUpdate(statement4);
+		  
+		  
+		  String statement2 = "DELETE FROM `methods` WHERE id ='"+"741"+"'";		
 		  st.executeUpdate(statement2);
 		  
-		  String statement3 = "DELETE FROM `methods` WHERE methodname ='"+"method"+"'";		
+		  String statement3 = "DELETE FROM `methods` WHERE id ='"+"742"+"'";		
 		  st.executeUpdate(statement3);
 		  
-		  String statement4 = "DELETE FROM `methodcalls` WHERE callername ='"+"CALLER"+"'";		
-		  st.executeUpdate(statement4);
+		 
 		  
 		 
 		 String statement10 = "ALTER TABLE `methods` AUTO_INCREMENT = 740";		
 		  st.executeUpdate(statement10);
-		  */
-		 String  statement10 = "INSERT INTO `methods`(`methodname`, `methodnamerefined`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+"method"+"','" +"method"+"','" +"method"+"','"  +100+"','"+"mmmm" +"')";		
+		  
+		   statement10 = "INSERT INTO `methods`(`methodname`, `methodnamerefined`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+"method"+"','" +"method"+"','" +"method"+"','"  +100+"','"+"mmmm" +"')";		
 		  st.executeUpdate(statement10);
 		  statement10 = "INSERT INTO `methods`(`methodname`, `methodnamerefined`, `methodabbreviation`, `classid`, `classname`) VALUES ('"+"method2"+"','" +"method2"+"','" +"method2"+"','"  +100+"','"+"mmmm" +"')";		
 		  st.executeUpdate(statement10);
